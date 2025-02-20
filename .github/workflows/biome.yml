@@ -1,0 +1,26 @@
+name: JS Code quality
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+
+      # Checkout Repo
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # Setup Biome on runner
+      - name: Setup Biome
+        uses: biomejs/setup-biome@v2
+        with:
+          version: latest
+
+      # Run Biome 
+      - name: Run Biome
+        run: biome ci .
