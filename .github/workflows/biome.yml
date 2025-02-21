@@ -2,7 +2,7 @@ name: JS Code quality
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "main", "erl/feat/biome_gh_action" ]
   pull_request:
     branches: [ "main" ]
   workflow_dispatch:
