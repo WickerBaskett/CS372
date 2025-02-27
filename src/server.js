@@ -12,8 +12,10 @@ const __dirname = dirname(__filename);
 const app = express();
 const port = 4200;
 
-app.use(express.static("src/public"));
+app.use(express.static(path.join(__dirname, "/public")));
 app.use(bodyParser.urlencoded({ extended: true }));
+
+console.log(__dirname);
 
 app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "/public/login.html"));
@@ -25,11 +27,13 @@ app.get("/auth", (req, res) => {
   var user_pass = sha256.create();
   user_pass.update(req.query.password_input);
   user_pass.hex();
+  console.log(user_pass.hex());
 
   mongo_retrieve(req.query.username_input).then((result) => {
-    console.log(result.password);
+    console.log(result);
     if (result.password == user_pass) {
         console.log("Good :]");
+        res.redirect("/gallery.html");
     } else {
         console.log("Bad:( 😧");
     }
