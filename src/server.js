@@ -2,7 +2,7 @@ import express from "express";
 import bodyParser from "body-parser";
 import path from "path";
 import { mongo_retrieve } from "./mongo.mjs";
-import { sha256 } from 'js-sha256';
+import { sha256 } from "js-sha256";
 import { fileURLToPath } from "url";
 import { dirname } from "path";
 
@@ -32,10 +32,10 @@ app.get("/auth", (req, res) => {
   mongo_retrieve(req.query.username_input).then((result) => {
     console.log(result);
     if (result.password == user_pass) {
-        console.log("Good :]");
-        res.redirect("/gallery.html");
+      console.log("Good :]");
+      res.redirect("/gallery.html");
     } else {
-        console.log("Bad:( 😧");
+      console.log("Bad:( 😧");
     }
   });
 });

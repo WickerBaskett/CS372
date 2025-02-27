@@ -10,8 +10,8 @@ export async function mongo_retrieve(username) {
     const coll = database.collection("loginInfo");
     console.log("Sending request to db");
 
-    const distinctValues = await coll.findOne({ name: username })
-    
+    const distinctValues = await coll.findOne({ name: username });
+
     console.log("Returning from mongo_retrieve()");
     return distinctValues;
   } finally {
