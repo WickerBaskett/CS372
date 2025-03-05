@@ -5,13 +5,12 @@ import { mongo_retrieve, mongo_update_login_tally } from "./mongo.mjs";
 import { sha256 } from "js-sha256";
 import { fileURLToPath } from "url";
 import { dirname } from "path";
-import EventEmitter from "events";
 
 // Holds state for failed login attempts
 const login_context = {
   failed: false,
   message: "",
-}
+};
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -24,17 +23,17 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 console.log(__dirname);
 
+/// Endpoint for serving the login page
 app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "/public/login.html"));
 });
 
-/// Endpoint responsible for validating user login
-/// attempts
+/// Endpoint responsible for validating user login attempts
 app.get("/auth", (req, res) => {
   res.setHeader("Content-Type", "application/json");
 
   mongo_retrieve(req.query.username_input).then((result) => {
-    // Check that user exists
+    // Check that there is an account associated with username
     if (result == null) {
       console.log("User does not exist");
       res.redirect("/login.html");
@@ -43,13 +42,13 @@ app.get("/auth", (req, res) => {
       return;
     }
 
-    // Hash the passed password for comparison to stored password
+    // Hash the user password for comparison to stored password
     var user_pass = sha256.create();
     user_pass.update(req.query.password_input);
     user_pass.hex();
     console.log(user_pass.hex());
 
-    // Check if password is valid
+    // Route the client based on authentication success or failure
     if (result.password == user_pass) {
       console.log("Good :]");
       res.redirect("/gallery.html");
@@ -59,7 +58,7 @@ app.get("/auth", (req, res) => {
       res.redirect("/login.html");
       login_context.message = "Invalid Password";
       login_context.failed = true;
-      mongo_update_login_tally(req.query.username_input, result.login_tally)
+      mongo_update_login_tally(req.query.username_input, result.login_tally);
     }
   });
 });
@@ -81,7 +80,7 @@ app.get("/events", (req, res) => {
   res.on("close", () => {
     console.log("SSE session closed by client");
     res.end();
-  })
+  });
 });
 
 app.listen(port, () => {
