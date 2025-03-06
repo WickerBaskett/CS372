@@ -1,3 +1,8 @@
+// server.js
+// Nodejs server that serves a login page
+// to the client and handles authentication
+// of user passwords submitted from client pages
+
 import express from "express";
 import bodyParser from "body-parser";
 import path from "path";
@@ -30,9 +35,9 @@ app.get("/", (req, res) => {
 
 /// Endpoint responsible for validating user login attempts
 app.get("/auth", (req, res) => {
-    res.setHeader("Content-Type", "application/json");
+  res.setHeader("Content-Type", "application/json");
 
-    retrieveUser(req.query.username_input).then((result) => {
+  retrieveUser(req.query.username_input).then((result) => {
     // Check that there is an account associated with username
     if (result == null) {
       console.log("User does not exist");

@@ -1,4 +1,7 @@
-// 
+// mongo.mjs
+// Handles retrieval and insertion of data
+// into the mongodb database associated with
+// the service
 
 import { MongoClient } from "mongodb";
 
@@ -28,7 +31,7 @@ export async function retrieveUser(username) {
 }
 
 /**
- * Sets the login_tally field of the document with name matching 
+ * Sets the login_tally field of the document with name matching
  * username. If count is 2 then it will delete the associated account
  * @param {String} username
  * @param {Number} count
@@ -51,7 +54,6 @@ export async function updateLoginTally(username, count) {
         $set: { login_tally: count + 1 },
       },
     );
-    
   } finally {
     await client.close();
   }
