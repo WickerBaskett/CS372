@@ -37,10 +37,11 @@ app.get("/", (req, res) => {
 });
 
 /// Endpoint responsible for validating user login attempts
-app.get("/auth", (req, res) => {
+app.post("/auth", (req, res) => {
   res.setHeader("Content-Type", "application/json");
 
-  retrieveUser(req.query.username_input).then((result) => {
+  console.log("Searching for user: " + req.body.username_input);
+  retrieveUser(req.body.username_input).then((result) => {
     // Check that there is an account associated with username
     if (result == null) {
       console.log("User does not exist");
@@ -52,7 +53,7 @@ app.get("/auth", (req, res) => {
 
     // Hash the user password for comparison to stored password
     var user_pass = sha256.create();
-    user_pass.update(req.query.password_input);
+    user_pass.update(req.body.password_input);
     user_pass.hex();
     console.log(user_pass.hex());
 
