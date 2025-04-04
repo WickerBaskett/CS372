@@ -10,6 +10,7 @@ import { updateLoginTally, retrieveUser } from "./mongo.mjs";
 import { sha256 } from "js-sha256";
 import { fileURLToPath } from "url";
 import { dirname } from "path";
+import ExpressMongoSanitize from "express-mongo-sanitize";
 
 // Holds state for failed login attempts
 const loginContext = {
@@ -23,8 +24,10 @@ const __dirname = dirname(__filename);
 const app = express();
 const port = 4200;
 
+// Set up middleware
 app.use(express.static(path.join(__dirname, "/public")));
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use(ExpressMongoSanitize());
 
 console.log(__dirname);
 
