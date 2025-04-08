@@ -45,7 +45,7 @@ app.post("/auth", (req, res) => {
     // Check that there is an account associated with username
     if (result == null) {
       console.log("User does not exist");
-      res.redirect("/login.html");
+      res.redirect("/loginAlert.html");
       loginContext.message = "User does not exist";
       loginContext.failed = true;
       return;
@@ -64,31 +64,11 @@ app.post("/auth", (req, res) => {
       updateLoginTally(req.query.username_input, -1);
     } else {
       console.log("Invalid Password");
-      res.redirect("/login.html");
+      res.redirect("/loginAlert.html");
       loginContext.message = "Invalid Password";
       loginContext.failed = true;
       updateLoginTally(req.query.username_input, result.login_tally);
     }
-  });
-});
-
-/// Establishes endpoint for Server Sent Events (SSE)
-/// Sends an alert to the client on failed login attempt
-app.get("/events", (req, res) => {
-  console.log("SSE connection requested");
-  res.setHeader("Content-Type", "text/event-stream");
-  res.setHeader("Cache-Control", "no-cache");
-  res.setHeader("Connection", "keep-alive");
-  res.flushHeaders();
-
-  if (loginContext.failed) {
-    res.write("data: " + loginContext.message + "\n\n");
-    loginContext.failed = true;
-  }
-
-  res.on("close", () => {
-    console.log("SSE session closed by client");
-    res.end();
   });
 });
 
