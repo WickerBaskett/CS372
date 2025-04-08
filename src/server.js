@@ -35,7 +35,7 @@ app.post("/auth", (req, res) => {
   res.setHeader("Content-Type", "application/json");
 
   if (!checkPasswordFormat(req.body.password_input)) {
-    console.log("Password failed to meet complextiy requirnments")
+    console.log("Password failed to meet complextiy requirnments");
     res.redirect("/loginAlert.html");
     return;
   }
