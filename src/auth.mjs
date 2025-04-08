@@ -1,3 +1,6 @@
+// auth.mjs
+// Contians logic to check password complexity
+
 
 /**
  * Checks if pass meets password complexity requirnments
