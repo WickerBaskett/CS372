@@ -11,7 +11,7 @@ import { fileURLToPath } from "url";
 import { dirname } from "path";
 import ExpressMongoSanitize from "express-mongo-sanitize";
 
-import { updateLoginTally, retrieveUser } from "./mongo.mjs";
+import { updateLoginTally, retrieveUser, retrieveVideos } from "./mongo.mjs";
 import { checkPasswordFormat } from "./auth.mjs";
 import { setHeapSnapshotNearHeapLimit } from "v8";
 
@@ -70,8 +70,14 @@ app.post("/auth", (req, res) => {
 // Sends a json payload with all video urls encoded
 app.get("/videos", (req, res) => {
   console.log("Request for videos recieved!");
-  res.setHeader("Content-Type", "application/json");
-  res.end(JSON.stringify({url: "test", likes: 0, dislikes: 0}));
+  retrieveVideos().then((videos) => {
+    res.setHeader("Content-Type", "application/json");
+    res.end(
+      JSON.stringify({
+        videos: videos,
+      }),
+    );
+  });
 });
 
 app.listen(port, () => {

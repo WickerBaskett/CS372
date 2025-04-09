@@ -19,11 +19,9 @@ export async function retrieveUser(username) {
     // define a database and collection on which to run the method
     const database = client.db("importantDatabase");
     const coll = database.collection("users");
-    console.log("Sending request to db");
 
     const distinctValues = await coll.findOne({ username: username });
 
-    console.log("Returning from mongo_retrieve()");
     return distinctValues;
   } finally {
     await client.close();
@@ -54,6 +52,25 @@ export async function updateLoginTally(username, count) {
         },
       );
     }
+  } finally {
+    await client.close();
+  }
+}
+
+/**
+ * Retrieve the all videos stored in the database
+ * @returns {void}
+ * */
+export async function retrieveVideos() {
+  let client = new MongoClient(uri);
+  try {
+    // define a database and collection on which to run the method
+    const database = client.db("importantDatabase");
+    const coll = database.collection("videos");
+
+    const distinctValues = await coll.find().toArray();
+    console.log(distinctValues[0]);
+    return distinctValues;
   } finally {
     await client.close();
   }
