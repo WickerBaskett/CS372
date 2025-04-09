@@ -18,10 +18,10 @@ export async function retrieveUser(username) {
   try {
     // define a database and collection on which to run the method
     const database = client.db("importantDatabase");
-    const coll = database.collection("loginInfo");
+    const coll = database.collection("users");
     console.log("Sending request to db");
 
-    const distinctValues = await coll.findOne({ name: username });
+    const distinctValues = await coll.findOne({ username: username });
 
     console.log("Returning from mongo_retrieve()");
     return distinctValues;
@@ -41,19 +41,19 @@ export async function updateLoginTally(username, count) {
   let client = new MongoClient(uri);
   try {
     const database = client.db("importantDatabase");
-    const coll = database.collection("loginInfo");
+    const coll = database.collection("users");
 
     if (count == 2) {
       console.log("To many failed login attempts, deleting user: " + username);
       await coll.deleteOne({ name: username });
+    } else {
+      await coll.updateOne(
+        { name: username },
+        {
+          $set: { login_tally: count + 1 },
+        },
+      );
     }
-
-    await coll.updateOne(
-      { name: username },
-      {
-        $set: { login_tally: count + 1 },
-      },
-    );
   } finally {
     await client.close();
   }

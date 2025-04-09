@@ -66,6 +66,11 @@ app.post("/auth", (req, res) => {
   });
 });
 
+// Sends a json payload with all video urls encoded
+app.get("/videos", (req, res) => {
+
+});
+
 app.listen(port, () => {
   console.log("Server running on port 4200");
 });
