@@ -15,11 +15,12 @@ function populateVideo(res) {
   let row = table.insertRow();
   let cell = row.insertCell();
 
-  const a = document.createElement("a");
-  a.href = res.url;
-  cell.appendChild(a);
-  cell.innerText = res.url;
+  const cellAnchor = document.createElement("a");
+  cellAnchor.href = res.url;
+  cellAnchor.textContent = res.name;
+  cell.appendChild(cellAnchor);
 
+  //cell.textContent = res.name;
 }
 
 // Fetch all videos from db and populate the gallery with them
