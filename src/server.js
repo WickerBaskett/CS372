@@ -13,7 +13,6 @@ import ExpressMongoSanitize from "express-mongo-sanitize";
 
 import { updateLoginTally, retrieveUser, retrieveVideos } from "./mongo.mjs";
 import { checkPasswordFormat } from "./auth.mjs";
-import { setHeapSnapshotNearHeapLimit } from "v8";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);

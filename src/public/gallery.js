@@ -10,7 +10,6 @@ const table = document.getElementById("gal_table"); // Table element that videos
  * @param {} res
  */
 function populateVideo(res) {
-
   // Make a new cell in the table
   let row = table.insertRow();
   let cell = row.insertCell();
@@ -19,8 +18,6 @@ function populateVideo(res) {
   cellAnchor.href = res.url;
   cellAnchor.textContent = res.name;
   cell.appendChild(cellAnchor);
-
-  //cell.textContent = res.name;
 }
 
 // Fetch all videos from db and populate the gallery with them
@@ -32,10 +29,19 @@ fetch(url)
     return response.json();
   })
   .then((json) => {
-    json.videos.forEach((vid) => {
-      console.log("URL: " + vid.url + "   L: " + vid.likes + "   D: " + vid.dislikes);
-      populateVideo(vid)
-    });
+    Object.entries(json.videos)
+      .sort((a, b) => {
+        if (a[1].name < b[1].name) {
+          return -1;
+        }
+        if (a[1].name > b[1].name) {
+          return 1;
+        }
+        return 0;
+      })
+      .map((item) => {
+        populateVideo(item[1]);
+      });
   })
   .catch((error) => {
     console.error("An error occured with the fetch request: " + error);
