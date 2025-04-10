@@ -12,9 +12,8 @@ export function checkUsername(username) {
   if (email_reg.test(username)) {
     console.log("Valid email address");
     return true;
-  } else
-    console.log("Invalid email address");
-    return false;
+  } else console.log("Invalid email address");
+  return false;
 }
 
 /**

@@ -1,18 +1,21 @@
 // videoViewer.js
 // Handles logic for videoViewer page
 
-function onLike() {
-    let cookies = document.cookie;
-    const cookie_reg = /=*&/
-    cookie_reg.exec(cookies).forEach(item => {
-        console.log("Cookie: " + item);
-    })
-    function readCookie(name) { // Escape regexp special characters (thanks kangax!) name = name.replace(/([.*+?^=!:${}()|[\]\/\\])/g, ‘\\$1’);
-        
-        return match && unescape(match[1]); 
-    }
-    
-    fetch("/likes?vid=" + url + "&user=" + user);
+/**
+ * 
+ * @param {Number} opinion 
+ */
+function onOpinionChange(opinion) {
+  console.log("Opinion: " + opinion);
+  let cookies = document.cookie.split("&").map(item => {
+    let args = item.split("=")
+    return args;
+  }).reduce((acc, curr) => {
+    acc[curr[0]] = curr[1]
+    return acc;
+  }, []);
+
+  fetch("/opinion?vid=" + url + "&user=" + cookies["user"] +"&opinion=" + opinion);
 }
 
 const urlParams = new URLSearchParams(window.location.search);
@@ -21,3 +24,13 @@ let player = document.getElementById("video_player");
 player.setAttribute("src", url);
 
 
+const like_radio = document.getElementById("like");
+const dislike_radio = document.getElementById("dislike");
+
+like_radio.addEventListener("click", function() {
+  onOpinionChange(1);
+})
+
+dislike_radio.addEventListener("click", function() {
+  onOpinionChange(0);
+})

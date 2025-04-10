@@ -32,8 +32,8 @@ export async function retrieveUser(username) {
  * Add a new user to the users collection
  * User name and password are set according to parameters
  * All other user values are 0 by default
- * @param {String} pass 
- * @param {String} username 
+ * @param {String} pass
+ * @param {String} username
  */
 export async function createUser(username, pass) {
   let client = new MongoClient(uri);
@@ -42,8 +42,13 @@ export async function createUser(username, pass) {
     const database = client.db("importantDatabase");
     const coll = database.collection("users");
 
-    await coll.insertOne({username: username, password: pass, login_tally: 0, role: 0, favorites: []});
-
+    await coll.insertOne({
+      username: username,
+      password: pass,
+      login_tally: 0,
+      role: 0,
+      favorites: [],
+    });
   } finally {
     await client.close();
   }
@@ -51,7 +56,8 @@ export async function createUser(username, pass) {
 
 /**
  * Sets the login_tally field of the document with name matching
- * username. If count is 2 then it will delete the associated account
+ * username to count + 1. If count is 2 then it will delete the 
+ * associated account
  * @param {String} username
  * @param {Number} count
  * @returns {Promise<void>}
@@ -90,7 +96,9 @@ export async function retrieveVideos(query) {
     const database = client.db("importantDatabase");
     const coll = database.collection("videos");
 
-    const distinctValues = await coll.find({"name": {"$regex": query, "$options": "i"}}).toArray();
+    const distinctValues = await coll
+      .find({ name: { $regex: query, $options: "i" } })
+      .toArray();
     console.log(distinctValues[0]);
     return distinctValues;
   } finally {
@@ -100,25 +108,24 @@ export async function retrieveVideos(query) {
 
 /**
  * Retrieve likes/dislikes
- * Increment/decrement likes based on user input
- * @param {String} vid 
+ * Increment/decrement likes based on user input, if dir is
+ * true increment likes, if dir is false decrement likes
+ * @param {String} vid
+ * @param {{key: value}} inc_query
  * @returns {void}
  */
-export async function updateLikesTally(vid) {
+export async function updateUserOpinion(vid, inc_query) {
   let client = new MongoClient(uri);
   try {
     // define a database and collection on which to run the method
     const database = client.db("importantDatabase");
     const coll = database.collection("videos");
-    
-    console.log(vid);
 
-    const filter = {url: vid};
-    const update = {$inc: {likes: 1}};
-    
+    const filter = { url: vid };
+    const update = { $inc: inc_query };
+
     const value = await coll.updateOne(filter, update);
 
-    console.log("Made it past update 1");
   } finally {
     await client.close();
   }
@@ -126,8 +133,8 @@ export async function updateLikesTally(vid) {
 
 /**
  * Add liked videos to user's favorites list
- * @param {String} user 
- * @param {String} vid 
+ * @param {String} user
+ * @param {String} vid
  * @return {void}
  */
 export async function addToFavorites(vid, user) {
@@ -136,11 +143,10 @@ export async function addToFavorites(vid, user) {
     const database = client.db("importantDatabase");
     const coll = database.collection("users");
 
-    const filter = {username: user};
-    const update = {$push: {favorites: vid}};
+    const filter = { username: user };
+    const update = { $push: { favorites: vid } };
 
     const value = await coll.updateOne(filter, update);
-
   } finally {
     await client.close();
   }

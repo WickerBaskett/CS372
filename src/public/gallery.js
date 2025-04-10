@@ -1,6 +1,6 @@
 // gallery.js
 // Requests list of videos and dynamically
-// creates entries for each video
+// Creates entries for each video
 
 const url = "http://localhost:4200"; // Endpoint to retrieve videos, should add a config option for this
 const table = document.getElementById("gal_table"); // Table element that videos will be added to
@@ -23,7 +23,7 @@ function populateVideo(res) {
 }
 
 // Fetch all videos from db and populate the gallery with them
-fetch(url + "/videos?q="+query)
+fetch(url + "/videos?q=" + query)
   .then((response) => {
     if (!response.ok) {
       throw new Error("Failed to get list of videos");
@@ -46,5 +46,5 @@ fetch(url + "/videos?q="+query)
       });
   })
   .catch((error) => {
-    console.error("An error occured with the fetch request: " + error);
+    console.error("An error occurred with the fetch request: " + error);
   });
