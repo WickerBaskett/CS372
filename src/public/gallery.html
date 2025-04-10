@@ -6,9 +6,15 @@
 <html>
   <head> </head>
   <body>
-    <div class="search" id="search_container">
-      1
-    </div>
+    <form
+      action="http://localhost:4200/search"
+      method="GET"
+      name="search_form"
+      id="search_req"
+    >
+      <input type="text" placeholder="Search..." id="search_query">
+      <input type ="submit" name="search_submit_button" id="search_form_submit">
+    </form>
     <p class="text" id="gal_text">Gallery</p>
     <table class="gallery" id="gal_table">
       <tr>

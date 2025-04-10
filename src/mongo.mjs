@@ -29,6 +29,27 @@ export async function retrieveUser(username) {
 }
 
 /**
+ * Add a new user to the users collection
+ * User name and password are set according to parameters
+ * All other user values are 0 by default
+ * @param {String} pass 
+ * @param {String} username 
+ */
+export async function createUser(username, pass) {
+  let client = new MongoClient(uri);
+  try {
+    // define a database and collection on which to run the method
+    const database = client.db("importantDatabase");
+    const coll = database.collection("users");
+
+    await coll.insertOne({username: username, password: pass, login_tally: 0, role: 0, favorites: []});
+
+  } finally {
+    await client.close();
+  }
+}
+
+/**
  * Sets the login_tally field of the document with name matching
  * username. If count is 2 then it will delete the associated account
  * @param {String} username
@@ -86,17 +107,21 @@ export async function retrieveVideos(query = {}) {
 export async function updateLikesTally(vid) {
   let client = new MongoClient(uri);
   try {
+    // define a database and collection on which to run the method
     const database = client.db("importantDatabase");
     const coll = database.collection("videos");
     
+    console.log(vid);
+
     const filter = {url: vid};
     const update = {$inc: {likes: 1}};
     
-    coll.updateOne(filter, update);
+    const value = await coll.updateOne(filter, update);
+
+    console.log("Made it past update 1");
   } finally {
     await client.close();
   }
-
 }
 
 /**
@@ -114,7 +139,7 @@ export async function addToFavorites(vid, user) {
     const filter = {username: user};
     const update = {$push: {favorites: vid}};
 
-    coll.updateOne(filter, update);
+    const value = await coll.updateOne(filter, update);
 
   } finally {
     await client.close();

@@ -12,9 +12,8 @@ import { dirname } from "path";
 import ExpressMongoSanitize from "express-mongo-sanitize";
 import cookieParser from "cookie-parser";
 
-import { updateLoginTally, retrieveUser, retrieveVideos, updateLikesTally, addToFavorites } from "./mongo.mjs";
-import { checkPasswordFormat } from "./auth.mjs";
-//import { checkUsername } from "./nameAuth.mjs"
+import { updateLoginTally, retrieveUser, retrieveVideos, createUser, updateLikesTally, addToFavorites } from "./mongo.mjs";
+import { checkPasswordFormat, checkUsername } from "./validity.mjs";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -74,26 +73,28 @@ app.post("/auth", (req, res) => {
 // Endpoint responsible for the creation of new user accounts via login page
 app.post("/new_acc", (req, res) => {
   res.setHeader("Content-Type", "application/json");
-  
+  const alert_url = "/login.html?alert=1"
+
   if (!checkPasswordFormat(req.body.new_password_input)) {
     console.log("Password failed to meet complexity requirements");
-    res.redirect("/loginAlert.html");
+    res.redirect(alert_url);
     return;
   }
 
-  if (!checkUsername(req.body.new_user)){
+  if (checkUsername(req.body.new_user)){
     console.log("Username failed to meet requirements");
-    res.redirect("/loginAlert.html");
+    res.redirect(alert_url);
     return;
   }
   
   // Hash the user password for security
   var user_pass = sha256.create();
   user_pass.update(req.body.new_password_input);
-  user_pass.hex();  
 
   //Insert username and password into database
-  
+  createUser(req.body.new_username_input, user_pass.hex());
+
+  res.redirect("/login.html");
 });
 
 // Sends a json payload with all video urls encoded
@@ -109,13 +110,17 @@ app.get("/videos", (req, res) => {
   });
 });
 
+app.get("/search", (req, res) => {
+  console.log("Search Query: " + req.query.search_query);
+})
+
 app.get("/videoViewer", (req, res) => {
   res.sendFile(path.join(__dirname, "/public/videoViewer.html"));
 });
 
 app.get("/likes", (req, res) => {
-  //updateLikesTally(req.query.vid);
-  //addToFavorites(req.query.vid, req.query.user);
+  updateLikesTally(req.query.vid);
+  addToFavorites(req.query.vid, req.query.user);
   res.sendStatus(200);
 });
 
