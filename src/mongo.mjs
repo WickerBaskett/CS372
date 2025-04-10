@@ -48,6 +48,7 @@ export async function createUser(username, pass) {
       login_tally: 0,
       role: 0,
       favorites: [],
+      disfavorites: [],
     });
   } finally {
     await client.close();
@@ -56,7 +57,7 @@ export async function createUser(username, pass) {
 
 /**
  * Sets the login_tally field of the document with name matching
- * username to count + 1. If count is 2 then it will delete the 
+ * username to count + 1. If count is 2 then it will delete the
  * associated account
  * @param {String} username
  * @param {Number} count
@@ -125,7 +126,6 @@ export async function updateUserOpinion(vid, inc_query) {
     const update = { $inc: inc_query };
 
     const value = await coll.updateOne(filter, update);
-
   } finally {
     await client.close();
   }
@@ -135,16 +135,49 @@ export async function updateUserOpinion(vid, inc_query) {
  * Add liked videos to user's favorites list
  * @param {String} user
  * @param {String} vid
+ * @param {Boolean} adding 
  * @return {void}
  */
-export async function addToFavorites(vid, user) {
+export async function updateFavorites(vid, user, adding) {
   let client = new MongoClient(uri);
   try {
     const database = client.db("importantDatabase");
     const coll = database.collection("users");
 
     const filter = { username: user };
-    const update = { $push: { favorites: vid } };
+    let update = {}
+    if (adding) {
+      update = { $push: { favorites: vid } };
+    } else {
+      update = { $pull: { favorites: vid } };
+    }
+
+    const value = await coll.updateOne(filter, update);
+  } finally {
+    await client.close();
+  }
+}
+
+/**
+ * Add liked videos to user's favorites list
+ * @param {String} user
+ * @param {String} vid
+ * @param {Boolean} adding 
+ * @return {void}
+ */
+export async function updateDisfavorites(vid, user, adding) {
+  let client = new MongoClient(uri);
+  try {
+    const database = client.db("importantDatabase");
+    const coll = database.collection("users");
+
+    const filter = { username: user };
+    let update = {}
+    if (adding) {
+      update = { $push: { disfavorites: vid } };
+    } else {
+      update = { $pull: { disfavorites: vid } };
+    }
 
     const value = await coll.updateOne(filter, update);
   } finally {

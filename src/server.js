@@ -18,7 +18,8 @@ import {
   retrieveVideos,
   createUser,
   updateUserOpinion,
-  addToFavorites,
+  updateDisfavorites,
+  updateFavorites,
 } from "./mongo.mjs";
 import { checkPasswordFormat, checkUsername } from "./validity.mjs";
 
@@ -131,14 +132,36 @@ app.get("/videoViewer", (req, res) => {
 
 // Handles a user liking a video
 app.get("/opinion", (req, res) => {
-  let opinion = req.query.opinion;
-  
-  if (opinion == 1) { // User liked the video
-    updateUserOpinion(req.query.vid, {likes: 1});
-    addToFavorites(req.query.vid, req.query.user);
-  } else { // User disliked the video
-    updateUserOpinion(req.query.vid, {dislikes: 1});
-  }
+  console.log("In /opinion");
+  const opinion = req.query.opinion;
+  const vid = req.query.vid
+  const user = req.query.user;
+  retrieveUser(user).then((result) => {
+    let favorites = result.favorites;
+    let disfavorites = result.disfavorites;
+
+    console.log("Favorites: " + favorites[0]);
+    console.log(favorites.includes(vid));
+
+    
+    if (opinion == 1 && !favorites.includes(vid)) {
+      // User liked the video
+      updateUserOpinion(vid, { likes: 1 });
+      updateFavorites(vid, user, true);
+      if (disfavorites.includes(vid)) {
+        updateUserOpinion(vid, { dislikes: -1 });
+        updateDisfavorites(vid, user, false);
+      }
+    } else if (opinion == 0 && !disfavorites.includes(vid)) {
+      // User disliked the video
+      updateUserOpinion(vid, { dislikes: 1 });
+      updateDisfavorites(vid, user, true);
+      if (favorites.includes(vid)) {
+        updateUserOpinion(vid, { likes: -1 });
+        updateFavorites(vid, user, false);
+      }
+    }
+  });
   res.sendStatus(200);
 });
 
