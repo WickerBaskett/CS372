@@ -100,7 +100,7 @@ app.post("/new_acc", (req, res) => {
 // Sends a json payload with all video urls encoded
 app.get("/videos", (req, res) => {
   console.log("Request for videos recieved!");
-  retrieveVideos().then((videos) => {
+  retrieveVideos(req.query.q).then((videos) => {
     res.setHeader("Content-Type", "application/json");
     res.end(
       JSON.stringify({
@@ -110,14 +110,19 @@ app.get("/videos", (req, res) => {
   });
 });
 
+// Redirects from gallery back to gallery with a query parameter
+// to filter the displayed videos with
 app.get("/search", (req, res) => {
-  console.log("Search Query: " + req.query.search_query);
+  console.log("Search Query: " + req.query.search);
+  res.redirect("/gallery.html?q=" + req.query.search);
 })
 
+// Serves the video viewer page
 app.get("/videoViewer", (req, res) => {
   res.sendFile(path.join(__dirname, "/public/videoViewer.html"));
 });
 
+// Handles a user liking a video
 app.get("/likes", (req, res) => {
   updateLikesTally(req.query.vid);
   addToFavorites(req.query.vid, req.query.user);
