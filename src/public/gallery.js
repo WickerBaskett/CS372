@@ -2,10 +2,23 @@
 // Requests list of videos and dynamically
 // Creates entries for each video
 
-const url = "http://localhost:4200"; // Endpoint to retrieve videos, should add a config option for this
+const server_url = "http://localhost:4200"; // Endpoint to retrieve videos, should add a config option for this
 const table = document.getElementById("gal_table"); // Table element that videos will be added to
 const urlParams = new URLSearchParams(window.location.search); // A list of all query parameters
 const query = urlParams.get("q"); // The search query used to filter displayed videos
+const fav = urlParams.get("fav");
+let cookies = document.cookie
+    .split("&")
+    .map((item) => {
+      let args = item.split("=");
+      return args;
+    })
+    .reduce((acc, curr) => {
+      acc[curr[0]] = curr[1];
+      return acc;
+    }, []);
+
+console.log(cookies["user"]);
 
 /**
  * Creates a row in a table for a single video
@@ -17,13 +30,15 @@ function populateVideo(res) {
   let cell = row.insertCell();
 
   const cellAnchor = document.createElement("a");
-  cellAnchor.href = url + "/videoViewer?url=" + res.url; // <- We can pass stuff to the loaded page like this
+  cellAnchor.href = server_url + "/videoViewer?url=" + res.url; // <- We can pass stuff to the loaded page like this
   cellAnchor.textContent = res.name;
   cell.appendChild(cellAnchor);
 }
 
 // Fetch all videos from db and populate the gallery with them
-fetch(url + "/videos?q=" + query)
+let req_url = server_url + "/videos?q=" + query +"&fav=" + fav + "&user=" + cookies["user"]
+console.log(req_url);
+fetch(req_url)
   .then((response) => {
     if (!response.ok) {
       throw new Error("Failed to get list of videos");
@@ -48,3 +63,10 @@ fetch(url + "/videos?q=" + query)
   .catch((error) => {
     console.error("An error occurred with the fetch request: " + error);
   });
+
+/*
+const fav_button = document.getElementById("fav_button");
+
+fav_button.addEventListener("click", function () {
+  console.log("Button Clicked!");
+});*/
