@@ -89,7 +89,7 @@ app.post("/new_acc", (req, res) => {
     return;
   }
 
-  if (checkUsername(req.body.new_user)) {
+  if (!checkUsername(req.body.new_username_input)) {
     console.log("Username failed to meet requirements");
     res.redirect(alert_url);
     return;
@@ -108,14 +108,55 @@ app.post("/new_acc", (req, res) => {
 // Sends a json payload with all video urls encoded
 app.get("/videos", (req, res) => {
   console.log("Request for videos recieved!");
-  retrieveVideos(req.query.q).then((videos) => {
-    res.setHeader("Content-Type", "application/json");
-    res.end(
-      JSON.stringify({
-        videos: videos,
-      }),
-    );
-  });
+  if (req.query.fav == "true") {
+    // Send the gallery a list of the users favorite movies
+    console.log("Favorites are being searched");
+    retrieveUser(req.query.user).then((result) => {
+      // Check that there is an account associated with username
+      if (result == null) {
+        console.log("User " + req.body.username_input + " does not exist");
+        res.status(500);
+        return;
+      }
+
+      if (result.favorites.length == 0) {
+        console.log("Favs Empty!");
+        res.status(200);
+        return;
+      }
+
+      let query = Object.entries(result.favorites).reduce((acc, item) => {
+        if (item[0] != 0 && item[1] != "") {
+          acc += "|";
+        }
+
+        let temp = item[1].split("/").at(-1);
+        let split = temp.split("?");
+        console.log(split[0]);
+        return acc + split[0];
+      }, "");
+      console.log(query);
+
+      retrieveVideos("url", query).then((videos) => {
+        res.setHeader("Content-Type", "application/json");
+        res.end(
+          JSON.stringify({
+            videos: videos,
+          }),
+        );
+      });
+    });
+  } else {
+    // Send a gallery a list of movies based off of query
+    retrieveVideos("name", req.query.q).then((videos) => {
+      res.setHeader("Content-Type", "application/json");
+      res.end(
+        JSON.stringify({
+          videos: videos,
+        }),
+      );
+    });
+  }
 });
 
 // Redirects from gallery back to gallery with a query parameter
@@ -134,7 +175,7 @@ app.get("/videoViewer", (req, res) => {
 app.get("/opinion", (req, res) => {
   console.log("In /opinion");
   const opinion = req.query.opinion;
-  const vid = req.query.vid
+  const vid = req.query.vid;
   const user = req.query.user;
   retrieveUser(user).then((result) => {
     let favorites = result.favorites;
@@ -143,7 +184,6 @@ app.get("/opinion", (req, res) => {
     console.log("Favorites: " + favorites[0]);
     console.log(favorites.includes(vid));
 
-    
     if (opinion == 1 && !favorites.includes(vid)) {
       // User liked the video
       updateUserOpinion(vid, { likes: 1 });

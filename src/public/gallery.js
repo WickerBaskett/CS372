@@ -8,15 +8,15 @@ const urlParams = new URLSearchParams(window.location.search); // A list of all 
 const query = urlParams.get("q"); // The search query used to filter displayed videos
 const fav = urlParams.get("fav");
 let cookies = document.cookie
-    .split("&")
-    .map((item) => {
-      let args = item.split("=");
-      return args;
-    })
-    .reduce((acc, curr) => {
-      acc[curr[0]] = curr[1];
-      return acc;
-    }, []);
+  .split("&")
+  .map((item) => {
+    let args = item.split("=");
+    return args;
+  })
+  .reduce((acc, curr) => {
+    acc[curr[0]] = curr[1];
+    return acc;
+  }, []);
 
 console.log(cookies["user"]);
 
@@ -36,7 +36,14 @@ function populateVideo(res) {
 }
 
 // Fetch all videos from db and populate the gallery with them
-let req_url = server_url + "/videos?q=" + query +"&fav=" + fav + "&user=" + cookies["user"]
+let req_url =
+  server_url +
+  "/videos?q=" +
+  query +
+  "&fav=" +
+  fav +
+  "&user=" +
+  cookies["user"];
 console.log(req_url);
 fetch(req_url)
   .then((response) => {

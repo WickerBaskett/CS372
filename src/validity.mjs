@@ -7,13 +7,15 @@
  * @returns {Boolean}
  * */
 export function checkUsername(username) {
-  const email_reg = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+  const email_reg = /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
   if (email_reg.test(username)) {
     console.log("Valid email address");
     return true;
-  } else console.log("Invalid email address");
-  return false;
+  } else {
+    console.log("Invalid email address");
+    return false;
+  }
 }
 
 /**
@@ -31,19 +33,19 @@ export function checkPasswordFormat(pass) {
     return false;
   }
 
-  if (cap_reg.exec(pass).length == 0) {
+  if (!cap_reg.test(pass)) {
     return false;
   }
 
-  if (low_reg.exec(pass).length == 0) {
+  if (!low_reg.test(pass)) {
     return false;
   }
 
-  if (num_reg.exec(pass).length == 0) {
+  if (!num_reg.test(pass)) {
     return false;
   }
 
-  if (spec_reg.exec(pass).length == 0) {
+  if (!spec_reg.test(pass)) {
     return false;
   }
 

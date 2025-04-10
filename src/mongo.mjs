@@ -90,17 +90,18 @@ export async function updateLoginTally(username, count) {
  * @param {String} query
  * @returns {void}
  * */
-export async function retrieveVideos(query) {
+export async function retrieveVideos(field, query) {
   let client = new MongoClient(uri);
   try {
     // define a database and collection on which to run the method
     const database = client.db("importantDatabase");
     const coll = database.collection("videos");
 
+    console.log({ [field]: { $regex: query, $options: "i" } });
+
     const distinctValues = await coll
-      .find({ name: { $regex: query, $options: "i" } })
+      .find({ [field]: { $regex: query, $options: "i" } })
       .toArray();
-    console.log(distinctValues[0]);
     return distinctValues;
   } finally {
     await client.close();
@@ -125,7 +126,7 @@ export async function updateUserOpinion(vid, inc_query) {
     const filter = { url: vid };
     const update = { $inc: inc_query };
 
-    const value = await coll.updateOne(filter, update);
+    await coll.updateOne(filter, update);
   } finally {
     await client.close();
   }
@@ -135,7 +136,7 @@ export async function updateUserOpinion(vid, inc_query) {
  * Add liked videos to user's favorites list
  * @param {String} user
  * @param {String} vid
- * @param {Boolean} adding 
+ * @param {Boolean} adding
  * @return {void}
  */
 export async function updateFavorites(vid, user, adding) {
@@ -145,14 +146,14 @@ export async function updateFavorites(vid, user, adding) {
     const coll = database.collection("users");
 
     const filter = { username: user };
-    let update = {}
+    let update = {};
     if (adding) {
       update = { $push: { favorites: vid } };
     } else {
       update = { $pull: { favorites: vid } };
     }
 
-    const value = await coll.updateOne(filter, update);
+    await coll.updateOne(filter, update);
   } finally {
     await client.close();
   }
@@ -162,7 +163,7 @@ export async function updateFavorites(vid, user, adding) {
  * Add liked videos to user's favorites list
  * @param {String} user
  * @param {String} vid
- * @param {Boolean} adding 
+ * @param {Boolean} adding
  * @return {void}
  */
 export async function updateDisfavorites(vid, user, adding) {
@@ -172,14 +173,14 @@ export async function updateDisfavorites(vid, user, adding) {
     const coll = database.collection("users");
 
     const filter = { username: user };
-    let update = {}
+    let update = {};
     if (adding) {
       update = { $push: { disfavorites: vid } };
     } else {
       update = { $pull: { disfavorites: vid } };
     }
 
-    const value = await coll.updateOne(filter, update);
+    await coll.updateOne(filter, update);
   } finally {
     await client.close();
   }
