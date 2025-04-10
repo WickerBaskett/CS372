@@ -59,6 +59,7 @@ export async function updateLoginTally(username, count) {
 
 /**
  * Retrieve the all videos stored in the database
+ * @param {{}} [query={}] 
  * @returns {void}
  * */
 export async function retrieveVideos(query = {}) {
@@ -71,6 +72,50 @@ export async function retrieveVideos(query = {}) {
     const distinctValues = await coll.find({}).toArray();
     console.log(distinctValues[0]);
     return distinctValues;
+  } finally {
+    await client.close();
+  }
+}
+
+/**
+ * Retrieve likes/dislikes
+ * Increment/decrement likes based on user input
+ * @param {String} vid 
+ * @returns {void}
+ */
+export async function updateLikesTally(vid) {
+  let client = new MongoClient(uri);
+  try {
+    const database = client.db("importantDatabase");
+    const coll = database.collection("videos");
+    
+    const filter = {url: vid};
+    const update = {$inc: {likes: 1}};
+    
+    coll.updateOne(filter, update);
+  } finally {
+    await client.close();
+  }
+
+}
+
+/**
+ * Add liked videos to user's favorites list
+ * @param {String} user 
+ * @param {String} vid 
+ * @return {void}
+ */
+export async function addToFavorites(vid, user) {
+  let client = new MongoClient(uri);
+  try {
+    const database = client.db("importantDatabase");
+    const coll = database.collection("users");
+
+    const filter = {username: user};
+    const update = {$push: {favorites: vid}};
+
+    coll.updateOne(filter, update);
+
   } finally {
     await client.close();
   }

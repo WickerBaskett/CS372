@@ -10,9 +10,11 @@ import { sha256 } from "js-sha256";
 import { fileURLToPath } from "url";
 import { dirname } from "path";
 import ExpressMongoSanitize from "express-mongo-sanitize";
+import cookieParser from "cookie-parser";
 
-import { updateLoginTally, retrieveUser, retrieveVideos } from "./mongo.mjs";
+import { updateLoginTally, retrieveUser, retrieveVideos, updateLikesTally, addToFavorites } from "./mongo.mjs";
 import { checkPasswordFormat } from "./auth.mjs";
+import { checkUsername } from "./nameAuth.mjs"
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -24,6 +26,7 @@ const port = 4200;
 app.use(express.static(path.join(__dirname, "/public")));
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(ExpressMongoSanitize());
+app.use(cookieParser());
 
 // Endpoint for serving the login page
 app.get("/", (req, res) => {
@@ -35,7 +38,7 @@ app.post("/auth", (req, res) => {
   res.setHeader("Content-Type", "application/json");
 
   if (!checkPasswordFormat(req.body.password_input)) {
-    console.log("Password failed to meet complextiy requirnments");
+    console.log("Password failed to meet complexity requirments");
     res.redirect("/loginAlert.html");
     return;
   }
@@ -56,6 +59,7 @@ app.post("/auth", (req, res) => {
     // Route the client based on authentication success or failure
     if (result.password == user_pass) {
       console.log("Good :]");
+      res.cookie("user", req.body.username_input);
       res.redirect("/gallery.html");
       updateLoginTally(req.body.username_input, -1);
     } else {
@@ -64,6 +68,25 @@ app.post("/auth", (req, res) => {
       updateLoginTally(req.body.username_input, result.login_tally);
     }
   });
+});
+
+// Endpoint responsible for the creation of new user accounts via login page
+app.post("/new_acc", (req, res) => {
+  res.setHeader("Content-Type", "application/json");
+  
+  if (!checkPasswordFormat(req.body.new_password_input)) {
+    console.log("Password failed to meet complexity requirements");
+    res.redirect("/loginAlert.html");
+    return;
+  }
+
+  if (!checkUsername(req.body.new_user))
+  
+  //check if username is legit here
+
+  //Hash password here
+
+  //Insert into database
 });
 
 // Sends a json payload with all video urls encoded
@@ -81,6 +104,12 @@ app.get("/videos", (req, res) => {
 
 app.get("/videoViewer", (req, res) => {
   res.sendFile(path.join(__dirname, "/public/videoViewer.html"));
+});
+
+app.get("/likes", (req, res) => {
+  //updateLikesTally(req.query.vid);
+  //addToFavorites(req.query.vid, req.query.user);
+  res.sendStatus(200);
 });
 
 app.listen(port, () => {

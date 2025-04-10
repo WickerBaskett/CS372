@@ -7,8 +7,9 @@ let player = document.getElementById("video_player");
 player.setAttribute("src", url);
 
 let like = document.getElementById("like");
-if (!like) {
-    
-}
+console.log(document.cookie);
+fetch("/likes?vid=" + url + "&user=");
+
+if (!like) {}
 
 console.log(url);
