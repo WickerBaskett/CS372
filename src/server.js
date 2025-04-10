@@ -14,7 +14,7 @@ import cookieParser from "cookie-parser";
 
 import { updateLoginTally, retrieveUser, retrieveVideos, updateLikesTally, addToFavorites } from "./mongo.mjs";
 import { checkPasswordFormat } from "./auth.mjs";
-import { checkUsername } from "./nameAuth.mjs"
+//import { checkUsername } from "./nameAuth.mjs"
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -35,11 +35,12 @@ app.get("/", (req, res) => {
 
 // Endpoint responsible for validating user login attempts
 app.post("/auth", (req, res) => {
+  const alert_url = "/login.html?alert=1"
   res.setHeader("Content-Type", "application/json");
 
   if (!checkPasswordFormat(req.body.password_input)) {
     console.log("Password failed to meet complexity requirments");
-    res.redirect("/loginAlert.html");
+    res.redirect(alert_url);
     return;
   }
 
@@ -47,7 +48,7 @@ app.post("/auth", (req, res) => {
     // Check that there is an account associated with username
     if (result == null) {
       console.log("User " + req.body.username_input + " does not exist");
-      res.redirect("/loginAlert.html");
+      res.redirect(alert_url);
       return;
     }
 
@@ -64,7 +65,7 @@ app.post("/auth", (req, res) => {
       updateLoginTally(req.body.username_input, -1);
     } else {
       console.log("Invalid Password");
-      res.redirect("/loginAlert.html");
+      res.redirect(alert_url);
       updateLoginTally(req.body.username_input, result.login_tally);
     }
   });
@@ -80,13 +81,19 @@ app.post("/new_acc", (req, res) => {
     return;
   }
 
-  if (!checkUsername(req.body.new_user))
+  if (!checkUsername(req.body.new_user)){
+    console.log("Username failed to meet requirements");
+    res.redirect("/loginAlert.html");
+    return;
+  }
   
-  //check if username is legit here
+  // Hash the user password for security
+  var user_pass = sha256.create();
+  user_pass.update(req.body.new_password_input);
+  user_pass.hex();  
 
-  //Hash password here
-
-  //Insert into database
+  //Insert username and password into database
+  
 });
 
 // Sends a json payload with all video urls encoded
