@@ -61,14 +61,14 @@ export async function updateLoginTally(username, count) {
  * Retrieve the all videos stored in the database
  * @returns {void}
  * */
-export async function retrieveVideos() {
+export async function retrieveVideos(query = {}) {
   let client = new MongoClient(uri);
   try {
     // define a database and collection on which to run the method
     const database = client.db("importantDatabase");
     const coll = database.collection("videos");
 
-    const distinctValues = await coll.find().toArray();
+    const distinctValues = await coll.find({}).toArray();
     console.log(distinctValues[0]);
     return distinctValues;
   } finally {

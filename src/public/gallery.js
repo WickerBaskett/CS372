@@ -2,7 +2,7 @@
 // Requests list of videos and dynamically
 // creates entries for each video
 
-const url = "http://localhost:4200/videos"; // Endpoint to retrieve videos, should add a config option for this
+const url = "http://localhost:4200"; // Endpoint to retrieve videos, should add a config option for this
 const table = document.getElementById("gal_table"); // Table element that videos will be added to
 
 /**
@@ -15,13 +15,13 @@ function populateVideo(res) {
   let cell = row.insertCell();
 
   const cellAnchor = document.createElement("a");
-  cellAnchor.href = res.url;
+  cellAnchor.href = url + "/videoViewer?url=" + res.url; // <- We can pass stuff to the loaded page like this
   cellAnchor.textContent = res.name;
   cell.appendChild(cellAnchor);
 }
 
 // Fetch all videos from db and populate the gallery with them
-fetch(url)
+fetch(url + "/videos")
   .then((response) => {
     if (!response.ok) {
       throw new Error("Failed to get list of videos");

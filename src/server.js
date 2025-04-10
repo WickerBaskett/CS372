@@ -79,6 +79,10 @@ app.get("/videos", (req, res) => {
   });
 });
 
+app.get("/videoViewer", (req, res) => {
+  res.sendFile(path.join(__dirname, "/public/videoViewer.html"));
+});
+
 app.listen(port, () => {
   console.log("Server running on port 4200");
 });
