@@ -18,12 +18,10 @@ export async function retrieveUser(username) {
   try {
     // define a database and collection on which to run the method
     const database = client.db("importantDatabase");
-    const coll = database.collection("loginInfo");
-    console.log("Sending request to db");
+    const coll = database.collection("users");
 
-    const distinctValues = await coll.findOne({ name: username });
+    const distinctValues = await coll.findOne({ username: username });
 
-    console.log("Returning from mongo_retrieve()");
     return distinctValues;
   } finally {
     await client.close();
@@ -31,8 +29,36 @@ export async function retrieveUser(username) {
 }
 
 /**
+ * Add a new user to the users collection
+ * User name and password are set according to parameters
+ * All other user values are 0 by default
+ * @param {String} pass
+ * @param {String} username
+ */
+export async function createUser(username, pass) {
+  let client = new MongoClient(uri);
+  try {
+    // define a database and collection on which to run the method
+    const database = client.db("importantDatabase");
+    const coll = database.collection("users");
+
+    await coll.insertOne({
+      username: username,
+      password: pass,
+      login_tally: 0,
+      role: 0,
+      favorites: [],
+      disfavorites: [],
+    });
+  } finally {
+    await client.close();
+  }
+}
+
+/**
  * Sets the login_tally field of the document with name matching
- * username. If count is 2 then it will delete the associated account
+ * username to count + 1. If count is 2 then it will delete the
+ * associated account
  * @param {String} username
  * @param {Number} count
  * @returns {Promise<void>}
@@ -41,19 +67,120 @@ export async function updateLoginTally(username, count) {
   let client = new MongoClient(uri);
   try {
     const database = client.db("importantDatabase");
-    const coll = database.collection("loginInfo");
+    const coll = database.collection("users");
 
     if (count == 2) {
       console.log("To many failed login attempts, deleting user: " + username);
       await coll.deleteOne({ name: username });
+    } else {
+      await coll.updateOne(
+        { name: username },
+        {
+          $set: { login_tally: count + 1 },
+        },
+      );
+    }
+  } finally {
+    await client.close();
+  }
+}
+
+/**
+ * Retrieve the all videos stored in the database
+ * @param {String} query
+ * @returns {void}
+ * */
+export async function retrieveVideos(field, query) {
+  let client = new MongoClient(uri);
+  try {
+    // define a database and collection on which to run the method
+    const database = client.db("importantDatabase");
+    const coll = database.collection("videos");
+
+    console.log({ [field]: { $regex: query, $options: "i" } });
+
+    const distinctValues = await coll
+      .find({ [field]: { $regex: query, $options: "i" } })
+      .toArray();
+    return distinctValues;
+  } finally {
+    await client.close();
+  }
+}
+
+/**
+ * Retrieve likes/dislikes
+ * Increment/decrement likes based on user input, if dir is
+ * true increment likes, if dir is false decrement likes
+ * @param {String} vid
+ * @param {{key: value}} inc_query
+ * @returns {void}
+ */
+export async function updateUserOpinion(vid, inc_query) {
+  let client = new MongoClient(uri);
+  try {
+    // define a database and collection on which to run the method
+    const database = client.db("importantDatabase");
+    const coll = database.collection("videos");
+
+    const filter = { url: vid };
+    const update = { $inc: inc_query };
+
+    await coll.updateOne(filter, update);
+  } finally {
+    await client.close();
+  }
+}
+
+/**
+ * Add liked videos to user's favorites list
+ * @param {String} user
+ * @param {String} vid
+ * @param {Boolean} adding
+ * @return {void}
+ */
+export async function updateFavorites(vid, user, adding) {
+  let client = new MongoClient(uri);
+  try {
+    const database = client.db("importantDatabase");
+    const coll = database.collection("users");
+
+    const filter = { username: user };
+    let update = {};
+    if (adding) {
+      update = { $push: { favorites: vid } };
+    } else {
+      update = { $pull: { favorites: vid } };
     }
 
-    await coll.updateOne(
-      { name: username },
-      {
-        $set: { login_tally: count + 1 },
-      },
-    );
+    await coll.updateOne(filter, update);
+  } finally {
+    await client.close();
+  }
+}
+
+/**
+ * Add liked videos to user's favorites list
+ * @param {String} user
+ * @param {String} vid
+ * @param {Boolean} adding
+ * @return {void}
+ */
+export async function updateDisfavorites(vid, user, adding) {
+  let client = new MongoClient(uri);
+  try {
+    const database = client.db("importantDatabase");
+    const coll = database.collection("users");
+
+    const filter = { username: user };
+    let update = {};
+    if (adding) {
+      update = { $push: { disfavorites: vid } };
+    } else {
+      update = { $pull: { disfavorites: vid } };
+    }
+
+    await coll.updateOne(filter, update);
   } finally {
     await client.close();
   }

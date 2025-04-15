@@ -1,0 +1,79 @@
+// gallery.js
+// Requests list of videos and dynamically
+// Creates entries for each video
+
+const server_url = "http://localhost:4200"; // Endpoint to retrieve videos, should add a config option for this
+const table = document.getElementById("gal_table"); // Table element that videos will be added to
+const urlParams = new URLSearchParams(window.location.search); // A list of all query parameters
+const query = urlParams.get("q"); // The search query used to filter displayed videos
+const fav = urlParams.get("fav");
+let cookies = document.cookie
+  .split("&")
+  .map((item) => {
+    let args = item.split("=");
+    return args;
+  })
+  .reduce((acc, curr) => {
+    acc[curr[0]] = curr[1];
+    return acc;
+  }, []);
+
+console.log(cookies["user"]);
+
+/**
+ * Creates a row in a table for a single video
+ * @param {} res
+ */
+function populateVideo(res) {
+  // Make a new cell in the table
+  let row = table.insertRow();
+  let cell = row.insertCell();
+
+  const cellAnchor = document.createElement("a");
+  cellAnchor.href = server_url + "/videoViewer?url=" + res.url; // <- We can pass stuff to the loaded page like this
+  cellAnchor.textContent = res.name;
+  cell.appendChild(cellAnchor);
+}
+
+// Fetch all videos from db and populate the gallery with them
+let req_url =
+  server_url +
+  "/videos?q=" +
+  query +
+  "&fav=" +
+  fav +
+  "&user=" +
+  cookies["user"];
+console.log(req_url);
+fetch(req_url)
+  .then((response) => {
+    if (!response.ok) {
+      throw new Error("Failed to get list of videos");
+    }
+    return response.json();
+  })
+  .then((json) => {
+    Object.entries(json.videos)
+      .sort((a, b) => {
+        if (a[1].name < b[1].name) {
+          return -1;
+        }
+        if (a[1].name > b[1].name) {
+          return 1;
+        }
+        return 0;
+      })
+      .map((item) => {
+        populateVideo(item[1]);
+      });
+  })
+  .catch((error) => {
+    console.error("An error occurred with the fetch request: " + error);
+  });
+
+/*
+const fav_button = document.getElementById("fav_button");
+
+fav_button.addEventListener("click", function () {
+  console.log("Button Clicked!");
+});*/
