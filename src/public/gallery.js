@@ -44,7 +44,10 @@ let req_url =
   fav +
   "&user=" +
   cookies["user"];
+
 console.log(req_url);
+
+
 fetch(req_url)
   .then((response) => {
     if (!response.ok) {

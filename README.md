@@ -6,7 +6,7 @@ This is the repository containing a semester project for CS372 at the University
 
 # Installing Dev Dependencies
 
-To Ensure you have all dependencies properly installed run `npm install`
+To ensure you have all dependencies properly installed, run `npm install`
 
 # Setting up the Mongodb Database with dummy values
 User Account Credentials:
@@ -22,6 +22,12 @@ db.users.insertOne({username: "test@test.test", password: "54de7f606f2523cba8efa
 Video creation command:
 ```
 db.videos.insertOne({name: "test", url: "https://www.youtube.com/embed/M5FGuBatbTg?si=W25JyYlJveMuvbi3", likes: 0, dislikes: 0, comment: "This is a comment"})
+```
+
+# Local file setup
+You will need to create a file named `.env` in the root directory of this project with the following fields:
+```
+SESSION_KEY="your_key_here"
 ```
 
 # Linting with ESLint

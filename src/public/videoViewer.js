@@ -1,13 +1,7 @@
 // videoViewer.js
 // Handles logic for videoViewer page
 
-/**
- *
- * @param {Number} opinion
- */
-function onOpinionChange(opinion) {
-  console.log("Opinion: " + opinion);
-  let cookies = document.cookie
+let cookies = document.cookie
     .split("&")
     .map((item) => {
       let args = item.split("=");
@@ -17,6 +11,13 @@ function onOpinionChange(opinion) {
       acc[curr[0]] = curr[1];
       return acc;
     }, []);
+
+/**
+ *
+ * @param {Number} opinion
+ */
+function onOpinionChange(opinion) {
+  console.log("Opinion: " + opinion);
 
   fetch(
     "/opinion?vid=" + url + "&user=" + cookies["user"] + "&opinion=" + opinion,
@@ -38,3 +39,37 @@ like_radio.addEventListener("click", function () {
 dislike_radio.addEventListener("click", function () {
   onOpinionChange(0);
 });
+
+// Check user permissions
+// Fetch videos
+let req_url =
+  server_url +
+  "/videos?q=" +
+  url +
+  "&fav=&user=" + cookies["user"];
+
+fetch(req_url)
+.then((response) => {
+  if (!response.ok) {
+    throw new Error("Failed to get list of videos");
+  }
+  return response.json();
+  })
+  .then((json) => {
+    Object.entries(json.videos)
+      .sort((a, b) => {
+        if (a[1].name < b[1].name) {
+          return -1;
+        }
+        if (a[1].name > b[1].name) {
+          return 1;
+        }
+        return 0;
+      })
+      .map((item) => {
+        populateVideo(item[1]);
+      });
+  })
+  .catch((error) => {
+    console.error("An error occurred with the fetch request: " + error);
+  });

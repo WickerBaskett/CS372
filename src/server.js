@@ -11,6 +11,8 @@ import { fileURLToPath } from "url";
 import { dirname } from "path";
 import ExpressMongoSanitize from "express-mongo-sanitize";
 import cookieParser from "cookie-parser";
+import session from "express-session";
+import { configDotenv } from "dotenv";
 
 import {
   updateLoginTally,
@@ -29,11 +31,22 @@ const __dirname = dirname(__filename);
 const app = express();
 const port = 4200;
 
+// Load secrets from .env
+configDotenv()
+const session_key = process.env.SESSION_KEY
+console.log(session_key)
+
 // Set up middleware
 app.use(express.static(path.join(__dirname, "/public")));
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(ExpressMongoSanitize());
 app.use(cookieParser());
+app.use(session({
+  secret: session_key,
+  resave: false,
+  saveUninitialized: false,
+  cookie: { maxAge: 86400000 } // session timeout of 24 hours
+}))
 
 // Endpoint for serving the login page
 app.get("/", (req, res) => {
@@ -67,6 +80,8 @@ app.post("/auth", (req, res) => {
     // Route the client based on authentication success or failure
     if (result.password == user_pass) {
       console.log("Good :]");
+      req.session.isLoggedIn = true;
+      req.session.username = req.body.username_input;
       res.cookie("user", req.body.username_input);
       res.redirect("/gallery.html?q=");
       updateLoginTally(req.body.username_input, -1);
