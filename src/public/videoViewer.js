@@ -56,19 +56,8 @@ fetch(req_url)
   return response.json();
   })
   .then((json) => {
-    Object.entries(json.videos)
-      .sort((a, b) => {
-        if (a[1].name < b[1].name) {
-          return -1;
-        }
-        if (a[1].name > b[1].name) {
-          return 1;
-        }
-        return 0;
-      })
-      .map((item) => {
-        populateVideo(item[1]);
-      });
+    console.log(json.likes);
+    Object.entries(json.likes)
   })
   .catch((error) => {
     console.error("An error occurred with the fetch request: " + error);
