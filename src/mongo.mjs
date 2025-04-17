@@ -56,6 +56,55 @@ export async function createUser(username, pass) {
 }
 
 /**
+ * Add a new video to the videos collection
+ * Video name, url, and thumbnail are set according to parameters
+ * Likes/dislikes are 0 by default
+ * Comment is empty by default
+ * @param {String} videoName
+ * @param {String} videoURL
+ * @param {String} thumbURL
+ */
+export async function createVideo(videoName, videoURL, thumbURL) {
+  let client = new MongoClient(uri);
+  try {
+    // define a database and collection on which to run the method
+    const database = client.db("importantDatabase");
+    const coll = database.collection("videos");
+
+    await coll.insertOne({
+      name: videoName,
+      url: videoURL,
+      likes: 0,
+      dislikes: 0,
+      comment: "",
+      thumbnail: thumbURL,
+    });
+  } finally {
+    await client.close();
+  }
+}
+
+/**
+ * Remove a video from the videos collection
+ * Video is removed based on the name passed
+ * @param {String} removeVideoName
+ */
+export async function deleteVideo(removeVideoName) {
+  let client = new MongoClient(uri);
+  try {
+    // define a database and collection on which to run the method
+    const database = client.db("importantDatabase");
+    const coll = database.collection("videos");
+
+    await coll.deleteOne({
+      name: removeVideoName,
+    });
+  } finally {
+    await client.close();
+  }
+}
+
+/**
  * Sets the login_tally field of the document with name matching
  * username to count + 1. If count is 2 then it will delete the
  * associated account
@@ -96,8 +145,6 @@ export async function retrieveVideos(field, query) {
     // define a database and collection on which to run the method
     const database = client.db("importantDatabase");
     const coll = database.collection("videos");
-
-    console.log({ [field]: { $regex: query, $options: "i" } });
 
     const distinctValues = await coll
       .find({ [field]: { $regex: query, $options: "i" } })
@@ -179,6 +226,21 @@ export async function updateDisfavorites(vid, user, adding) {
     } else {
       update = { $pull: { disfavorites: vid } };
     }
+
+    await coll.updateOne(filter, update);
+  } finally {
+    await client.close();
+  }
+}
+
+export async function uploadComment(vid, comment) {
+  let client = new MongoClient(uri);
+  try {
+    const database = client.db("importantDatabase");
+    const coll = database.collection("videos");
+
+    const filter = { url: vid };
+    let update = {$set: {comment: comment}};
 
     await coll.updateOne(filter, update);
   } finally {

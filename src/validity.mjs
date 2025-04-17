@@ -51,3 +51,38 @@ export function checkPasswordFormat(pass) {
 
   return true;
 }
+
+/**
+ * Checks if url is a valid url
+ * @param {String} url
+ * @returns {Boolean}
+ * */
+export function checkURL(url) {
+  const url_reg =
+    /((([A-Za-z]{3,9}:(?:\/\/)?)(?:[-;:&=\+\$,\w]+@)?[A-Za-z0-9.-]+|(?:www.|[-;:&=\+\$,\w]+@)[A-Za-z0-9.-]+)((?:\/[\+~%\/.\w-_]*)?\??(?:[-\+=&;%@.\w_]*)#?(?:[\w]*))?)/;
+
+  if (url_reg.test(url)) {
+    console.log("Valid url");
+    return true;
+  } else {
+    console.log("Invalid url");
+    return false;
+  }
+}
+
+/**
+ * Checks if thumbnail is a valid image link
+ * @param {String} thumbnail
+ * @returns {Boolean}
+ * */
+export function checkThumbnail(thumbnail) {
+  const thumbnail_reg = /^https?:\/\/(.+\/)+.+(\.(gif|png|jpg|jpeg|webp|svg|psd|bmp|tif))$/i;
+
+  if (thumbnail_reg.test(thumbnail)) {
+    console.log("Valid thumnbail");
+    return true;
+  } else {
+    console.log("Invalid thumbnail");
+    return false;
+  }
+}

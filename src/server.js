@@ -19,11 +19,19 @@ import {
   retrieveUser,
   retrieveVideos,
   createUser,
+  createVideo,
+  deleteVideo,
   updateUserOpinion,
   updateDisfavorites,
   updateFavorites,
+  uploadComment,
 } from "./mongo.mjs";
-import { checkPasswordFormat, checkUsername } from "./validity.mjs";
+import {
+  checkPasswordFormat,
+  checkUsername,
+  checkURL,
+  checkThumbnail,
+} from "./validity.mjs";
 
 ///////////////////
 //     Setup     //
@@ -61,9 +69,6 @@ app.use(cookieParser());
 
 // Custom Middleware to validate user session
 function authMiddleware(req, res, next) {
-  console.log("In authMiddleware: ");
-  console.log(req.session);
-
   if (req.session.isLoggedIn == true) {
     next();
   } else {
@@ -96,12 +101,17 @@ app.get("/gallery", authMiddleware, (req, res) => {
   res.sendFile(path.join(__dirname, "/protected/gallery.html"));
 });
 
+// Serves the video upload page with autentication middleware
+app.get("/uploadVideo", authMiddleware, (req, res) => {
+  res.sendFile(path.join(__dirname, "/protected/uploadVideo.html"));
+});
+
 ///////////////////////////
 //     API Endpoints     //
 ///////////////////////////
 
 // Endpoint responsible for validating user login attempts
-app.post("/auth", (req, res) => {
+app.post("/api/auth", (req, res) => {
   const alert_url = "/login.html?alert=1";
   res.setHeader("Content-Type", "application/json");
 
@@ -133,9 +143,6 @@ app.post("/auth", (req, res) => {
       req.session.username = req.body.username_input;
       req.session.role = result.role;
 
-      console.log("In /auth");
-      console.log(req.session);
-
       updateLoginTally(req.session.username, -1);
       res.redirect("/gallery?q=");
     } else {
@@ -147,7 +154,7 @@ app.post("/auth", (req, res) => {
 });
 
 // Endpoint responsible for the creation of new user accounts via login page
-app.post("/register", (req, res) => {
+app.post("/api/register", (req, res) => {
   res.setHeader("Content-Type", "application/json");
   const alert_url = "/login.html?alert=1";
 
@@ -173,12 +180,61 @@ app.post("/register", (req, res) => {
   res.redirect("/login.html");
 });
 
+// Endpoint responsible for the upload of new videos via video upload page
+app.post("/api/upload", authMiddleware, (req, res) => {
+  console.log(req.body);
+  res.setHeader("Content-Type", "application/json");
+  const video_alert_url = "/uploadVideo";
+
+  if (req.body.new_name_input == "") {
+    console.log("video name failed to meet requirements");
+    res.redirect(video_alert_url);
+    return;
+  }
+
+  // Determine if the video url is valid
+  if (!checkURL(req.body.new_URL_input)) {
+    console.log("video url has failed to meet requirements");
+    res.redirect(video_alert_url);
+    return;
+  }
+
+  // Determine if the image url is valid
+  //if (!checkThumbnail(req.body.new_thumbnail_input)) {
+  //  console.log("thumbnail url has failed to meet requirements");
+  //  res.redirect(video_alert_url);
+  //  return;
+  //}
+
+  // Insert video into database
+  createVideo(
+    req.body.new_name_input,
+    req.body.new_URL_input,
+    req.body.new_thumbnail_input,
+  );
+
+  res.redirect("/uploadVideo");
+});
+
+// Endpoint responsible for the upload of new videos via video upload page
+app.post("/api/remove", authMiddleware, (req, res) => {
+  res.setHeader("Content-Type", "application/json");
+
+  deleteVideo(req.body.video_name_input);
+  res.redirect("/uploadVideo");
+});
+
+app.post("/api/upload_comment", authMiddleware, (req, res) => {
+  let comment = req.body.comment;
+  let url = req.body.url;
+  uploadComment(url, comment);
+  res.redirect("/videoViewer?url=" + url);
+});
+
 // Sends a json payload with all video urls encoded
-app.get("/videos", (req, res) => {
-  console.log("Request for videos recieved!");
+app.get("/api/videos", authMiddleware, (req, res) => {
   if (req.query.fav == "true") {
     // Send the gallery a list of the users favorite movies
-    console.log("Favorites are being searched");
     retrieveUser(req.session.username).then((result) => {
       // Check that there is an account associated with username
       if (result == null) {
@@ -200,10 +256,8 @@ app.get("/videos", (req, res) => {
 
         let temp = item[1].split("/").at(-1);
         let split = temp.split("?");
-        console.log(split[0]);
         return acc + split[0];
       }, "");
-      console.log(query);
 
       retrieveVideos("url", query).then((videos) => {
         res.setHeader("Content-Type", "application/json");
@@ -232,24 +286,19 @@ app.get("/videos", (req, res) => {
 });
 
 // Handles a user liking a video
-app.get("/opinion", (req, res) => {
-  console.log("In /opinion");
-  console.log(req.session);
+app.get("/api/opinion", authMiddleware, (req, res) => {
   const opinion = req.query.opinion;
   const vid = req.query.vid;
   const user = req.session.username;
-  console.log(user);
+
   retrieveUser(user).then((result) => {
     if (result == undefined) {
-      console.log("User does not exist in /opinion");
+      console.log("User does not exist");
       res.sendStatus(500);
       return;
     }
     let favorites = result.favorites;
     let disfavorites = result.disfavorites;
-
-    console.log("Favorites: " + favorites[0]);
-    console.log(favorites.includes(vid));
 
     if (opinion == 1 && !favorites.includes(vid)) {
       // User liked the video
@@ -270,6 +319,16 @@ app.get("/opinion", (req, res) => {
     }
   });
   res.sendStatus(200);
+});
+
+app.get("/api/whoami", authMiddleware, (req, res) => {
+  res.setHeader("Content-Type", "application/json");
+  res.end(
+    JSON.stringify({
+      username: req.session.username,
+      role: req.session.role,
+    }),
+  );
 });
 
 app.listen(port, () => {

@@ -27,19 +27,23 @@ function clearTable() {
   table.detach();
 }
 
+// 
+function updateContentEditor() {
+  
+}
+
 /**
  * Updates the videos displayed based on query
  * @param {String} query
  */
 function updateDisplayedVideos(query) {
-
   // Fill in first row of table with column names
   let id_row = table.insertRow();
-  let name_cell = id_row.insertCell()
+  let name_cell = id_row.insertCell();
   name_cell.innerHTML = "Name";
 
   // Fetch all videos from db and populate the gallery with them
-  let req_url = server_url + "/videos?q=" + query + "&fav=" + fav;
+  let req_url = server_url + "/api/videos?q=" + query + "&fav=" + fav;
 
   console.log(req_url);
 
@@ -78,5 +82,12 @@ function onSearchClick() {
   let query = document.getElementById("search_query");
   updateDisplayedVideos(query.value);
 }
+
+/**
+ * Event handler for upload video button click
+ */
+document.getElementById("toUploadPage").onclick = function () {
+  window.location.href = "/uploadVideo";
+};
 
 updateDisplayedVideos("");
