@@ -29,7 +29,6 @@ function onOpinionChange(opinion) {
     console.log(role);
     if (role == undefined) {
       return;
-    } else if (role == 1) {
     } else if (role == 2) {
       updateMarketingManager();
     }
@@ -130,7 +129,7 @@ fetch(server_url + "/api/whoami")
   })
   .then((json) => {
     role = json.role;
-    
+
     if (json.role == 1) {
       // If the user is a Content Editor
       role_div.appendChild(document.createElement("br"));
@@ -139,7 +138,6 @@ fetch(server_url + "/api/whoami")
       role_div.appendChild(view_comment);
 
       updateContentEditor();
-
     } else if (json.role == 2) {
       // If user is a Marketing Manager
       let like_label = document.createElement("label");

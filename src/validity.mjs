@@ -59,7 +59,7 @@ export function checkPasswordFormat(pass) {
  * */
 export function checkURL(url) {
   const url_reg =
-    /((([A-Za-z]{3,9}:(?:\/\/)?)(?:[-;:&=\+\$,\w]+@)?[A-Za-z0-9.-]+|(?:www.|[-;:&=\+\$,\w]+@)[A-Za-z0-9.-]+)((?:\/[\+~%\/.\w-_]*)?\??(?:[-\+=&;%@.\w_]*)#?(?:[\w]*))?)/;
+    /((([A-Za-z]{3,9}:(?:\/\/)?)(?:[-;:&=+$,\w]+@)?[A-Za-z0-9.-]+|(?:www.|[-;:&=+$,\w]+@)[A-Za-z0-9.-]+)((?:\/[+~%/.\w-_]*)?\??(?:[-+=&;%@.\w_]*)#?(?:[\w]*))?)/;
 
   if (url_reg.test(url)) {
     console.log("Valid url");
@@ -91,8 +91,8 @@ export function checkThumbnail(thumbnail) {
 /**
  * Sanitize fields of videos
  * @param {Number} role
- * @param {Array} videos  
- * @returns 
+ * @param {Array} videos
+ * @returns
  */
 export function sanitizeVideos(role, videos) {
   let result = Object.entries(videos).map((video) => {
@@ -102,19 +102,21 @@ export function sanitizeVideos(role, videos) {
       name: video[1].name,
       url: video[1].url,
       thumbnail: video[1].thumbnail,
-    }
-    
-    if (role == 2) { // Marketing Manager
+    };
+
+    if (role == 2) {
+      // Marketing Manager
       sanitized.likes = video[1].likes;
       sanitized.dislikes = video[1].dislikes;
-    } else if (role == 1) { // Content Editor
+    } else if (role == 1) {
+      // Content Editor
       sanitized.comment = video[1].comment;
     }
     console.log("Sanitized: ");
     console.log(sanitized);
     return sanitized;
-  })
+  });
 
-  console.log(result)
+  console.log(result);
   return result;
 }

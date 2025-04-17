@@ -5,7 +5,6 @@
 const server_url = "http://localhost:4200"; // Endpoint to retrieve videos, should add a config option for this
 const table = document.getElementById("gal_table"); // Table element that videos will be added to
 const urlParams = new URLSearchParams(window.location.search); // A list of all query parameters
-const query = urlParams.get("q"); // The search query used to filter displayed videos
 const fav = urlParams.get("fav");
 
 /**
@@ -20,24 +19,17 @@ function populateVideo(res) {
   const cellAnchor = document.createElement("a");
   cellAnchor.href = server_url + "/videoViewer?url=" + res.url; // <- We can pass stuff to the loaded page like this
   cellAnchor.textContent = res.name;
-  
+
   const thumbnailImg = document.createElement("img");
   thumbnailImg.src = res.thumbnail;
   thumbnailImg.alt = "Le video thumbnail";
   thumbnailImg.style.width = "400px";
   thumbnailImg.style.height = "auto";
   thumbnailImg.style.display = "block";
-  
+
   cellAnchor.appendChild(thumbnailImg);
   cell.appendChild(cellAnchor);
 }
-
-function clearTable() {
-  table.detach();
-}
-
-// Updates the display shown to content editors
-function updateContentEditor() {}
 
 /**
  * Updates the videos displayed based on query
@@ -62,10 +54,6 @@ function updateDisplayedVideos(query) {
       return response.json();
     })
     .then((json) => {
-      if (json.role == 1) {
-        let edit_button = document.createElement("button");
-      }
-
       Object.entries(json.videos)
         .sort((a, b) => {
           if (a[1].name < b[1].name) {
@@ -95,10 +83,30 @@ function onSearchClick() {
 }
 
 /**
- * Event handler for upload video button click
+ * Adds a button that links to the upload page for content editors
  */
-document.getElementById("toUploadPage").onclick = function () {
-  window.location.href = "/uploadVideo";
-};
+function addUploadPageButton() {
+  const upload_page = document.createElement("button");
+  document.getElementById("upload_button_location").appendChild(upload_page);
+  upload_page.onclick = function () {
+    window.location.href = "/uploadVideo";
+  };
+  upload_page.innerHTML = "To Video Tools Suite";
+}
 
+// Determine wether to add any elements based on the users role
+fetch(server_url + "/api/whoami")
+  .then((response) => {
+    if (!response.ok) {
+      throw new Error("Failed to get list of videos");
+    }
+    return response.json();
+  })
+  .then((json) => {
+    if (json.role == 1) {
+      addUploadPageButton();
+    }
+  });
+
+document.getElementById("search_submit_button").onclick = onSearchClick;
 updateDisplayedVideos("");

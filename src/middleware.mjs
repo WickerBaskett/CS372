@@ -1,12 +1,11 @@
-////////////////////////////////////
-//     Custom Auth Middleware     //
-////////////////////////////////////
+// middleware.mjs
+// Contains all custom middleware
 
 /**
  * Custom middleware to validate that user is logged in
- * @param {JSON} req 
- * @param {JSON} res 
- * @param {function} next 
+ * @param {object} req
+ * @param {object} res
+ * @param {function} next
  */
 export function authUser(req, res, next) {
   if (req.session.isLoggedIn == true) {
@@ -18,9 +17,9 @@ export function authUser(req, res, next) {
 
 /**
  * Custom middleware to validate that user is a Content Editor
- * @param {JSON} req 
- * @param {JSON} res 
- * @param {function} next 
+ * @param {object} req
+ * @param {object} res
+ * @param {function} next
  */
 export function authContentEditor(req, res, next) {
   if (req.session.role == 1) {
@@ -32,9 +31,9 @@ export function authContentEditor(req, res, next) {
 
 /**
  * Custom middleware to validate that user is a Content Editor
- * @param {JSON} req 
- * @param {JSON} res 
- * @param {function} next 
+ * @param {object} req
+ * @param {object} res
+ * @param {function} next
  */
 export function authMarketingManager(req, res, next) {
   if (req.session.role == 2) {

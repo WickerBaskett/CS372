@@ -107,8 +107,8 @@ export async function deleteVideo(removeVideoName) {
 /**
  * Updates fields specified in query for video specified by name
  * in the videos collection
- * @param {String} name 
- * @param {JSON} query 
+ * @param {String} name
+ * @param {JSON} query
  */
 export async function editVideo(filter, query) {
   let client = new MongoClient(uri);
