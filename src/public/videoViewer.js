@@ -36,6 +36,8 @@ function updateOpinionDisplay() {
         "Likes: " + json.videos[0].likes;
       document.getElementById("dislikecount").innerHTML =
         "Dislikes: " + json.videos[0].dislikes;
+      document.getElementById("comment").innerHTML =
+        "Comment(s):" + json.videos[0].comments;
     })
     .catch((error) => {
       console.error("An error occurred with the fetch request: " + error);
@@ -59,3 +61,7 @@ like_radio.addEventListener("click", function () {
 dislike_radio.addEventListener("click", function () {
   onOpinionChange(0);
 });
+
+document.getElementById("backToGallery").onclick = function () {
+  window.location.href = "/gallery";
+};

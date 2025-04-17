@@ -30,6 +30,11 @@ div#main-content {
   background-color: #c4cfda;
 }
 
+div.galleryButton {
+  position: relative;
+  left: 200px;
+}
+
 div.relative {
   position: relative;
   top: 130px;

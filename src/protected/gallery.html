@@ -21,29 +21,22 @@
     </div>
 
     <div class="relative" id="main-content">
-      <form
-        action="http://localhost:4200/search"
-        method="GET"
-        name="search_form"
-        id="search_req"
+      <input
+        type="text"
+        class="text_input"
+        id="search_query"
+        placeholder="Search..."
+      />
+      <button
+        id="search_submit_button"
+        class="button"
+        onclick="onSearchClick();"
       >
-        <input
-          type="text"
-          name="search"
-          id="search_query"
-          placeholder="Search..."
-        />
-        <input
-          type="submit"
-          name="search_submit_button"
-          id="search_form_submit"
-        />
-      </form>
+        Search
+      </button>
       <a href="http://localhost:4200/gallery?q=&fav=true">Favorites</a>
       <table class="gallery" id="gal_table">
-        <tr>
-          <th>Name</th>
-        </tr>
+        <!-- Gallery Goes Here -->
       </table>
       <script src="gallery.js"></script>
     </div>

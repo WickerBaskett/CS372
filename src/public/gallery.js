@@ -23,40 +23,60 @@ function populateVideo(res) {
   cell.appendChild(cellAnchor);
 }
 
-// Fetch all videos from db and populate the gallery with them
-let req_url = server_url + "/videos?q=" + query + "&fav=" + fav;
+function clearTable() {
+  table.detach();
+}
 
-console.log(req_url);
+/**
+ * Updates the videos displayed based on query
+ * @param {String} query
+ */
+function updateDisplayedVideos(query) {
 
-fetch(req_url)
-  .then((response) => {
-    if (!response.ok) {
-      throw new Error("Failed to get list of videos");
-    }
-    return response.json();
-  })
-  .then((json) => {
-    Object.entries(json.videos)
-      .sort((a, b) => {
-        if (a[1].name < b[1].name) {
-          return -1;
-        }
-        if (a[1].name > b[1].name) {
-          return 1;
-        }
-        return 0;
-      })
-      .map((item) => {
-        populateVideo(item[1]);
-      });
-  })
-  .catch((error) => {
-    console.error("An error occurred with the fetch request: " + error);
-  });
+  // Fill in first row of table with column names
+  let id_row = table.insertRow();
+  let name_cell = id_row.insertCell()
+  name_cell.innerHTML = "Name";
 
-/*
-const fav_button = document.getElementById("fav_button");
+  // Fetch all videos from db and populate the gallery with them
+  let req_url = server_url + "/videos?q=" + query + "&fav=" + fav;
 
-fav_button.addEventListener("click", function () {
-  console.log("Button Clicked!");
-});*/
+  console.log(req_url);
+
+  fetch(req_url)
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error("Failed to get list of videos");
+      }
+      return response.json();
+    })
+    .then((json) => {
+      Object.entries(json.videos)
+        .sort((a, b) => {
+          if (a[1].name < b[1].name) {
+            return -1;
+          }
+          if (a[1].name > b[1].name) {
+            return 1;
+          }
+          return 0;
+        })
+        .map((item) => {
+          populateVideo(item[1]);
+        });
+    })
+    .catch((error) => {
+      console.error("An error occurred with the fetch request: " + error);
+    });
+}
+
+/**
+ * Event handler for search button click
+ */
+function onSearchClick() {
+  table.innerHTML = "";
+  let query = document.getElementById("search_query");
+  updateDisplayedVideos(query.value);
+}
+
+updateDisplayedVideos("");

@@ -25,6 +25,10 @@ import {
 } from "./mongo.mjs";
 import { checkPasswordFormat, checkUsername } from "./validity.mjs";
 
+///////////////////
+//     Setup     //
+///////////////////
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
@@ -35,19 +39,10 @@ const port = 4200;
 configDotenv();
 const session_key = process.env.SESSION_KEY;
 
-// Custom Middleware to validate user session
-function authMiddleware(req, res, next) {
-  console.log("In authMiddleware: ");
-  console.log(req.session);
+///////////////////////
+//     Middleware    //
+///////////////////////
 
-  if (req.session.isLoggedIn == true) {
-    next();
-  } else {
-    res.redirect("/login.html?alert=2");
-  }
-}
-
-// Set up middleware
 app.use(
   session({
     secret: session_key,
@@ -64,6 +59,18 @@ app.use(ExpressMongoSanitize());
 app.use(express.static(path.join(__dirname, "/public")));
 app.use(cookieParser());
 
+// Custom Middleware to validate user session
+function authMiddleware(req, res, next) {
+  console.log("In authMiddleware: ");
+  console.log(req.session);
+
+  if (req.session.isLoggedIn == true) {
+    next();
+  } else {
+    res.redirect("/login.html?alert=2");
+  }
+}
+
 ///////////////////////////////
 //     Routing Endpoints     //
 ///////////////////////////////
@@ -76,18 +83,18 @@ app.get("/", (req, res) => {
 // Redirects from gallery back to gallery with a query parameter
 // to filter the displayed videos with
 app.get("/search", authMiddleware, (req, res) => {
-  res.
-  res.sendFile("/protected/gallery?q=" + req.query.search);
+  res.sendFile("/protected/gallery.html");
 });
 
-// Serves the video viewer page
+// Serves the video viewer page with authentication middleware
 app.get("/videoViewer", authMiddleware, (req, res) => {
   res.sendFile(path.join(__dirname, "/protected/videoViewer.html"));
 });
 
+// Serves the gallery page with authenitcation middleware
 app.get("/gallery", authMiddleware, (req, res) => {
   res.sendFile(path.join(__dirname, "/protected/gallery.html"));
-})
+});
 
 ///////////////////////////
 //     API Endpoints     //
@@ -214,7 +221,6 @@ app.get("/videos", (req, res) => {
       field = "name";
     }
     retrieveVideos(field, req.query.q).then((videos) => {
-
       res.setHeader("Content-Type", "application/json");
       res.end(
         JSON.stringify({
