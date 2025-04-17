@@ -3,3 +3,34 @@
     Handles styling of different elements
 */
 
+html,
+body {
+  margin: 0;
+}
+
+div#banner {
+  position: absolute;
+  top: 0;
+  left: 0;
+  background-color: #236192;
+  width: 100%;
+}
+
+div#banner-content {
+  width: 800px;
+  margin: 0 auto;
+  padding: 10px;
+  color: #ffcd00;
+  font-size: 50px;
+}
+
+div#main-content {
+  padding-top: 70px;
+  border: 2px solid #236192;
+  background-color: #c4cfda;
+}
+
+div.relative {
+  position: relative;
+  top: 130px;
+}

@@ -32,26 +32,66 @@ const app = express();
 const port = 4200;
 
 // Load secrets from .env
-configDotenv()
-const session_key = process.env.SESSION_KEY
-console.log(session_key)
+configDotenv();
+const session_key = process.env.SESSION_KEY;
+
+// Custom Middleware to validate user session
+function authMiddleware(req, res, next) {
+  console.log("In authMiddleware: ");
+  console.log(req.session);
+
+  if (req.session.isLoggedIn == true) {
+    next();
+  } else {
+    res.redirect("/login.html?alert=2");
+  }
+}
 
 // Set up middleware
-app.use(express.static(path.join(__dirname, "/public")));
+app.use(
+  session({
+    secret: session_key,
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+      secure: false,
+      maxAge: 86400000, // session timeout of 24 hours
+    },
+  }),
+);
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(ExpressMongoSanitize());
+app.use(express.static(path.join(__dirname, "/public")));
 app.use(cookieParser());
-app.use(session({
-  secret: session_key,
-  resave: false,
-  saveUninitialized: false,
-  cookie: { maxAge: 86400000 } // session timeout of 24 hours
-}))
+
+///////////////////////////////
+//     Routing Endpoints     //
+///////////////////////////////
 
 // Endpoint for serving the login page
 app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "/public/login.html"));
 });
+
+// Redirects from gallery back to gallery with a query parameter
+// to filter the displayed videos with
+app.get("/search", authMiddleware, (req, res) => {
+  res.
+  res.sendFile("/protected/gallery?q=" + req.query.search);
+});
+
+// Serves the video viewer page
+app.get("/videoViewer", authMiddleware, (req, res) => {
+  res.sendFile(path.join(__dirname, "/protected/videoViewer.html"));
+});
+
+app.get("/gallery", authMiddleware, (req, res) => {
+  res.sendFile(path.join(__dirname, "/protected/gallery.html"));
+})
+
+///////////////////////////
+//     API Endpoints     //
+///////////////////////////
 
 // Endpoint responsible for validating user login attempts
 app.post("/auth", (req, res) => {
@@ -80,11 +120,17 @@ app.post("/auth", (req, res) => {
     // Route the client based on authentication success or failure
     if (result.password == user_pass) {
       console.log("Good :]");
+
+      // Set session parameters
       req.session.isLoggedIn = true;
       req.session.username = req.body.username_input;
-      res.cookie("user", req.body.username_input);
-      res.redirect("/gallery.html?q=");
-      updateLoginTally(req.body.username_input, -1);
+      req.session.role = result.role;
+
+      console.log("In /auth");
+      console.log(req.session);
+
+      updateLoginTally(req.session.username, -1);
+      res.redirect("/gallery?q=");
     } else {
       console.log("Invalid Password");
       res.redirect(alert_url);
@@ -94,7 +140,7 @@ app.post("/auth", (req, res) => {
 });
 
 // Endpoint responsible for the creation of new user accounts via login page
-app.post("/new_acc", (req, res) => {
+app.post("/register", (req, res) => {
   res.setHeader("Content-Type", "application/json");
   const alert_url = "/login.html?alert=1";
 
@@ -126,7 +172,7 @@ app.get("/videos", (req, res) => {
   if (req.query.fav == "true") {
     // Send the gallery a list of the users favorite movies
     console.log("Favorites are being searched");
-    retrieveUser(req.query.user).then((result) => {
+    retrieveUser(req.session.username).then((result) => {
       // Check that there is an account associated with username
       if (result == null) {
         console.log("User " + req.body.username_input + " does not exist");
@@ -163,7 +209,12 @@ app.get("/videos", (req, res) => {
     });
   } else {
     // Send a gallery a list of movies based off of query
-    retrieveVideos("name", req.query.q).then((videos) => {
+    let field = req.query.field;
+    if (field == null) {
+      field = "name";
+    }
+    retrieveVideos(field, req.query.q).then((videos) => {
+
       res.setHeader("Content-Type", "application/json");
       res.end(
         JSON.stringify({
@@ -174,25 +225,20 @@ app.get("/videos", (req, res) => {
   }
 });
 
-// Redirects from gallery back to gallery with a query parameter
-// to filter the displayed videos with
-app.get("/search", (req, res) => {
-  console.log("Search Query: " + req.query.search);
-  res.redirect("/gallery.html?q=" + req.query.search);
-});
-
-// Serves the video viewer page
-app.get("/videoViewer", (req, res) => {
-  res.sendFile(path.join(__dirname, "/public/videoViewer.html"));
-});
-
 // Handles a user liking a video
 app.get("/opinion", (req, res) => {
   console.log("In /opinion");
+  console.log(req.session);
   const opinion = req.query.opinion;
   const vid = req.query.vid;
-  const user = req.query.user;
+  const user = req.session.username;
+  console.log(user);
   retrieveUser(user).then((result) => {
+    if (result == undefined) {
+      console.log("User does not exist in /opinion");
+      res.sendStatus(500);
+      return;
+    }
     let favorites = result.favorites;
     let disfavorites = result.disfavorites;
 

@@ -1,16 +1,6 @@
 // videoViewer.js
 // Handles logic for videoViewer page
-
-let cookies = document.cookie
-    .split("&")
-    .map((item) => {
-      let args = item.split("=");
-      return args;
-    })
-    .reduce((acc, curr) => {
-      acc[curr[0]] = curr[1];
-      return acc;
-    }, []);
+const server_url = "http://localhost:4200"; // Endpoint to retrieve videos, should add a config option for this
 
 /**
  *
@@ -19,15 +9,45 @@ let cookies = document.cookie
 function onOpinionChange(opinion) {
   console.log("Opinion: " + opinion);
 
-  fetch(
-    "/opinion?vid=" + url + "&user=" + cookies["user"] + "&opinion=" + opinion,
-  );
+  fetch("/opinion?vid=" + url + "&opinion=" + opinion).then(() => {
+    updateOpinionDisplay();
+  });
+}
+/**
+ * Updates like and dislike counter with current tallies
+ */
+function updateOpinionDisplay() {
+  const q_url = url.split("embed/")[1].split("?")[0];
+  console.log(q_url);
+
+  // Fetch video to display likes to Marketing Manager
+  let req_url = server_url + "/videos?q=" + q_url + "&fav=&field=url";
+
+  fetch(req_url)
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error("Failed to get video");
+      }
+      console.log("Response is good!");
+      return response.json();
+    })
+    .then((json) => {
+      document.getElementById("likecount").innerHTML =
+        "Likes: " + json.videos[0].likes;
+      document.getElementById("dislikecount").innerHTML =
+        "Dislikes: " + json.videos[0].dislikes;
+    })
+    .catch((error) => {
+      console.error("An error occurred with the fetch request: " + error);
+    });
 }
 
 const urlParams = new URLSearchParams(window.location.search);
 const url = urlParams.get("url");
 let player = document.getElementById("video_player");
 player.setAttribute("src", url);
+
+updateOpinionDisplay();
 
 const like_radio = document.getElementById("like");
 const dislike_radio = document.getElementById("dislike");
@@ -39,26 +59,3 @@ like_radio.addEventListener("click", function () {
 dislike_radio.addEventListener("click", function () {
   onOpinionChange(0);
 });
-
-// Check user permissions
-// Fetch videos
-let req_url =
-  server_url +
-  "/videos?q=" +
-  url +
-  "&fav=&user=" + cookies["user"];
-
-fetch(req_url)
-.then((response) => {
-  if (!response.ok) {
-    throw new Error("Failed to get list of videos");
-  }
-  return response.json();
-  })
-  .then((json) => {
-    console.log(json.likes);
-    Object.entries(json.likes)
-  })
-  .catch((error) => {
-    console.error("An error occurred with the fetch request: " + error);
-  });
