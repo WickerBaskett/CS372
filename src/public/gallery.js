@@ -20,6 +20,15 @@ function populateVideo(res) {
   const cellAnchor = document.createElement("a");
   cellAnchor.href = server_url + "/videoViewer?url=" + res.url; // <- We can pass stuff to the loaded page like this
   cellAnchor.textContent = res.name;
+  
+  const thumbnailImg = document.createElement("img");
+  thumbnailImg.src = res.thumbnail;
+  thumbnailImg.alt = "Le video thumbnail";
+  thumbnailImg.style.width = "400px";
+  thumbnailImg.style.height = "auto";
+  thumbnailImg.style.display = "block";
+  
+  cellAnchor.appendChild(thumbnailImg);
   cell.appendChild(cellAnchor);
 }
 
@@ -27,10 +36,8 @@ function clearTable() {
   table.detach();
 }
 
-// 
-function updateContentEditor() {
-  
-}
+// Updates the display shown to content editors
+function updateContentEditor() {}
 
 /**
  * Updates the videos displayed based on query
@@ -55,6 +62,10 @@ function updateDisplayedVideos(query) {
       return response.json();
     })
     .then((json) => {
+      if (json.role == 1) {
+        let edit_button = document.createElement("button");
+      }
+
       Object.entries(json.videos)
         .sort((a, b) => {
           if (a[1].name < b[1].name) {

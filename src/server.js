@@ -25,13 +25,20 @@ import {
   updateDisfavorites,
   updateFavorites,
   uploadComment,
+  editVideo,
 } from "./mongo.mjs";
 import {
   checkPasswordFormat,
   checkUsername,
   checkURL,
   checkThumbnail,
+  sanitizeVideos,
 } from "./validity.mjs";
+import {
+  authUser,
+  authContentEditor,
+  authMarketingManager,
+} from "./middleware.mjs"
 
 ///////////////////
 //     Setup     //
@@ -67,15 +74,6 @@ app.use(ExpressMongoSanitize());
 app.use(express.static(path.join(__dirname, "/public")));
 app.use(cookieParser());
 
-// Custom Middleware to validate user session
-function authMiddleware(req, res, next) {
-  if (req.session.isLoggedIn == true) {
-    next();
-  } else {
-    res.redirect("/login.html?alert=2");
-  }
-}
-
 ///////////////////////////////
 //     Routing Endpoints     //
 ///////////////////////////////
@@ -87,22 +85,22 @@ app.get("/", (req, res) => {
 
 // Redirects from gallery back to gallery with a query parameter
 // to filter the displayed videos with
-app.get("/search", authMiddleware, (req, res) => {
+app.get("/search", authUser, (req, res) => {
   res.sendFile("/protected/gallery.html");
 });
 
 // Serves the video viewer page with authentication middleware
-app.get("/videoViewer", authMiddleware, (req, res) => {
+app.get("/videoViewer", authUser, (req, res) => {
   res.sendFile(path.join(__dirname, "/protected/videoViewer.html"));
 });
 
 // Serves the gallery page with authenitcation middleware
-app.get("/gallery", authMiddleware, (req, res) => {
+app.get("/gallery", authUser, (req, res) => {
   res.sendFile(path.join(__dirname, "/protected/gallery.html"));
 });
 
 // Serves the video upload page with autentication middleware
-app.get("/uploadVideo", authMiddleware, (req, res) => {
+app.get("/uploadVideo", authUser, authContentEditor, (req, res) => {
   res.sendFile(path.join(__dirname, "/protected/uploadVideo.html"));
 });
 
@@ -181,7 +179,7 @@ app.post("/api/register", (req, res) => {
 });
 
 // Endpoint responsible for the upload of new videos via video upload page
-app.post("/api/upload", authMiddleware, (req, res) => {
+app.post("/api/upload", authUser, authContentEditor, (req, res) => {
   console.log(req.body);
   res.setHeader("Content-Type", "application/json");
   const video_alert_url = "/uploadVideo";
@@ -210,21 +208,44 @@ app.post("/api/upload", authMiddleware, (req, res) => {
   createVideo(
     req.body.new_name_input,
     req.body.new_URL_input,
-    req.body.new_thumbnail_input,
+    req.body.new_thumbail_input,
   );
 
   res.redirect("/uploadVideo");
 });
 
 // Endpoint responsible for the upload of new videos via video upload page
-app.post("/api/remove", authMiddleware, (req, res) => {
+app.post("/api/remove", authUser, authContentEditor, (req, res) => {
   res.setHeader("Content-Type", "application/json");
 
   deleteVideo(req.body.video_name_input);
   res.redirect("/uploadVideo");
 });
 
-app.post("/api/upload_comment", authMiddleware, (req, res) => {
+app.post("/api/edit", authUser, authContentEditor, (req, res) => {
+  console.log(req.body);
+  if (req.body.curr_name == "") {
+    res.statusMessage = "Current Name field was empty";
+    res.redirect("/uploadVideo");
+    return;
+  }
+
+  let query = {}
+  if (req.body.new_url != "") {
+    query.url = req.body.new_url;
+  }
+  if (req.body.new_name != "") {
+    query.name = req.body.new_name;
+  }
+  if (req.body.new_thumbnail != "") {
+    query.thumbnail = req.body.new_thumbnail;
+  }
+  editVideo({name: req.body.curr_name}, {$set: query});
+  res.redirect("/uploadVideo");
+})
+
+// Endpoint responsible for comment upload from Marketing Managers
+app.post("/api/upload_comment", authUser, authMarketingManager, (req, res) => {
   let comment = req.body.comment;
   let url = req.body.url;
   uploadComment(url, comment);
@@ -232,7 +253,9 @@ app.post("/api/upload_comment", authMiddleware, (req, res) => {
 });
 
 // Sends a json payload with all video urls encoded
-app.get("/api/videos", authMiddleware, (req, res) => {
+app.get("/api/videos", authUser, (req, res) => {
+  let role = req.session.role;
+
   if (req.query.fav == "true") {
     // Send the gallery a list of the users favorite movies
     retrieveUser(req.session.username).then((result) => {
@@ -260,10 +283,11 @@ app.get("/api/videos", authMiddleware, (req, res) => {
       }, "");
 
       retrieveVideos("url", query).then((videos) => {
+        let sanitizedVideos = sanitizeVideos(req.session.role, videos);
         res.setHeader("Content-Type", "application/json");
         res.end(
           JSON.stringify({
-            videos: videos,
+            videos: sanitizedVideos,
           }),
         );
       });
@@ -275,18 +299,19 @@ app.get("/api/videos", authMiddleware, (req, res) => {
       field = "name";
     }
     retrieveVideos(field, req.query.q).then((videos) => {
-      res.setHeader("Content-Type", "application/json");
-      res.end(
-        JSON.stringify({
-          videos: videos,
-        }),
-      );
+      let sanitizedVideos = sanitizeVideos(req.session.role, videos);
+        res.setHeader("Content-Type", "application/json");
+        res.end(
+          JSON.stringify({
+            videos: sanitizedVideos,
+          }),
+        );
     });
   }
 });
 
 // Handles a user liking a video
-app.get("/api/opinion", authMiddleware, (req, res) => {
+app.get("/api/opinion", authUser, (req, res) => {
   const opinion = req.query.opinion;
   const vid = req.query.vid;
   const user = req.session.username;
@@ -321,7 +346,7 @@ app.get("/api/opinion", authMiddleware, (req, res) => {
   res.sendStatus(200);
 });
 
-app.get("/api/whoami", authMiddleware, (req, res) => {
+app.get("/api/whoami", authUser, (req, res) => {
   res.setHeader("Content-Type", "application/json");
   res.end(
     JSON.stringify({

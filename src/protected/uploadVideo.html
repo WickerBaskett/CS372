@@ -43,8 +43,8 @@
           id="video_form_submit"
         />
       </form>
-      
-      <br>
+
+      <br />
 
       <form
         action="http://localhost:4200/api/remove"
@@ -52,16 +52,42 @@
         name="remove_video_form"
         id="remove_video_req"
       >
+        <p name="remove_video_input" id="video_out">
+          Remove a video here! (Input Video Name):
+        </p>
+        <input type="text" name="video_name_input" id="video_name_out" />
+        <input
+          type="submit"
+          name="video_remove_button"
+          id="video_removal_submit"
+        />
+      </form>
 
-      <p name="remove_video_input" id="video_out">
-        Remove a video here! (Input Video Name):
-      </p>
-      <input type="text" name="video_name_input" id="video_name_out" />
-      <input
-        type="submit"
-        name="video_remove_button"
-        id="video_removal_submit"
-      />
+      <br />
+
+      <form
+        action="http://localhost:4200/api/edit"
+        method="POST"
+        name="edit_video_form"
+        id="edit_video_req"
+      >
+        <label name="edit_video_prompt" id="edit_prompt">
+          Edit Video Here: 
+        </label>
+        <br>
+        <label for="curr_name" id="curr_name_label">Current Video Name:</label>
+        <input type="text" name="curr_name" id="curr_name_input">
+        <br>
+        <label for="new_url" id="new_url_label">New Video URL: </label>
+        <input type="text" name="new_url" id="new_url_input">
+        <br>
+        <label for="new_name" id="new_name_label">New Video Name: </label>
+        <input type="text" name="new_name" id="new_name_input">
+        <br>
+        <label for="new_thumbnail" id="new_thumbnail">New Video Thumbnail: </label>
+        <input type="text" name="new_thumbnail" id="new_thumbnail_input">
+        <br>
+        <input type="submit" class="submit_button" id="edit_submit_button">
       </form>
 
       <div class="galleryButton">

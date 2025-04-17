@@ -105,6 +105,25 @@ export async function deleteVideo(removeVideoName) {
 }
 
 /**
+ * Updates fields specified in query for video specified by name
+ * in the videos collection
+ * @param {String} name 
+ * @param {JSON} query 
+ */
+export async function editVideo(filter, query) {
+  let client = new MongoClient(uri);
+  try {
+    // define a database and collection on which to run the method
+    const database = client.db("importantDatabase");
+    const coll = database.collection("videos");
+
+    await coll.updateOne(filter, query);
+  } finally {
+    await client.close();
+  }
+}
+
+/**
  * Sets the login_tally field of the document with name matching
  * username to count + 1. If count is 2 then it will delete the
  * associated account
@@ -240,7 +259,7 @@ export async function uploadComment(vid, comment) {
     const coll = database.collection("videos");
 
     const filter = { url: vid };
-    let update = {$set: {comment: comment}};
+    let update = { $set: { comment: comment } };
 
     await coll.updateOne(filter, update);
   } finally {

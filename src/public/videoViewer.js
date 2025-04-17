@@ -42,7 +42,7 @@ function updateMarketingManager() {
   console.log("Made it to update marketing manager");
   const q_url = url.split("embed/")[1].split("?")[0];
 
-  // Fetch video to display likes to Marketing Manager and comments to Content Editor
+  // Fetch video to display likes/dislikes to Marketing Manager
   let req_url = server_url + "/api/videos?q=" + q_url + "&fav=&field=url";
 
   fetch(req_url)
@@ -54,6 +54,7 @@ function updateMarketingManager() {
       return response.json();
     })
     .then((json) => {
+      console.log(json.videos[0]);
       console.log("Updating opinion labels");
       document.getElementById("like_label").innerHTML =
         "Likes: " + json.videos[0].likes;
@@ -63,6 +64,36 @@ function updateMarketingManager() {
     .catch((error) => {
       console.error(
         "An error occurred with the updateMarketingManager fetch request: " +
+          error,
+      );
+    });
+}
+
+/**
+ * Updates the display shown to Content Editors
+ */
+function updateContentEditor() {
+  console.log("Made it to update content editor");
+  const q_url = url.split("embed/")[1].split("?")[0];
+
+  // Fetch video to display comment to Content Editor
+  let req_url = server_url + "/api/videos?q=" + q_url + "&fav=&field=url";
+
+  fetch(req_url)
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error("Failed to get video");
+      }
+      console.log("Response is good!");
+      return response.json();
+    })
+    .then((json) => {
+      document.getElementById("view_comment").innerHTML =
+        "Comment: " + json.videos[0].comment;
+    })
+    .catch((error) => {
+      console.error(
+        "An error occurred with the updateContentEditor fetch request: " +
           error,
       );
     });
@@ -99,21 +130,30 @@ fetch(server_url + "/api/whoami")
   })
   .then((json) => {
     role = json.role;
+    
     if (json.role == 1) {
       // If the user is a Content Editor
+      role_div.appendChild(document.createElement("br"));
+      let view_comment = document.createElement("label");
+      view_comment.id = "view_comment";
+      role_div.appendChild(view_comment);
+
+      updateContentEditor();
+
     } else if (json.role == 2) {
+      // If user is a Marketing Manager
       let like_label = document.createElement("label");
       let dislike_label = document.createElement("label");
       let comment_form = document.createElement("form");
       let comment_text = document.createElement("input");
       let comment_submit = document.createElement("input");
-      let static_data = document.createElement("input"); 
+      let static_data = document.createElement("input");
 
       like_label.id = "like_label";
       dislike_label.id = "dislike_label";
 
       comment_form.id = "comment_form";
-      comment_form.name = "comment_form_name"
+      comment_form.name = "comment_form_name";
       comment_form.method = "POST";
       comment_form.action = server_url + "/api/upload_comment";
 
@@ -131,7 +171,6 @@ fetch(server_url + "/api/whoami")
       comment_submit.type = "submit";
       comment_submit.innerText = "Submit";
       comment_submit.name = "submit_button";
-
 
       role_div.appendChild(like_label);
       role_div.appendChild(document.createElement("br"));
