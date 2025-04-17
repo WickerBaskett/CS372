@@ -1,0 +1,101 @@
+<!-- 
+  uploadVideo.html
+  Allows content editors to upload and edit videos 
+
+  - add a button to the gallery that allows me to access this page
+-->
+
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Video Handling Suite</title>
+    <link rel="stylesheet" href="stylesheet.css" />
+  </head>
+  <body>
+    <div id="banner">
+      <div id="banner-content">
+        <img
+          src="/images/0824_White_UAF_Three_Letter_RGB.svg"
+          width="100"
+          height="100"
+        />
+        VIDEO TOOLS SUITE
+      </div>
+    </div>
+
+    <div class="relative" id="main-content">
+      <form
+        action="http://localhost:4200/api/upload"
+        method="POST"
+        name="new_video_form"
+        id="new_video_req"
+      >
+        <p name="new_video_input" id="video_in">
+          Upload a video here! (Name/Video URL/Thumbnail URL):
+        </p>
+        <input type="text" name="new_name_input" id="new_name_in" />
+        <input type="text" name="new_URL_input" id="new_URL_in" />
+        <input type="text" name="new_thumbail_input" id="new_thumbnail_in" />
+        <input
+          type="submit"
+          name="video_submit_button"
+          id="video_form_submit"
+        />
+      </form>
+
+      <br />
+
+      <form
+        action="http://localhost:4200/api/remove"
+        method="POST"
+        name="remove_video_form"
+        id="remove_video_req"
+      >
+        <p name="remove_video_input" id="video_out">
+          Remove a video here! (Input Video Name):
+        </p>
+        <input type="text" name="video_name_input" id="video_name_out" />
+        <input
+          type="submit"
+          name="video_remove_button"
+          id="video_removal_submit"
+        />
+      </form>
+
+      <br />
+
+      <form
+        action="http://localhost:4200/api/edit"
+        method="POST"
+        name="edit_video_form"
+        id="edit_video_req"
+      >
+        <label name="edit_video_prompt" id="edit_prompt">
+          Edit Video Here:
+        </label>
+        <br />
+        <label for="curr_name" id="curr_name_label">Current Video Name:</label>
+        <input type="text" name="curr_name" id="curr_name_input" />
+        <br />
+        <label for="new_url" id="new_url_label">New Video URL: </label>
+        <input type="text" name="new_url" id="new_url_input" />
+        <br />
+        <label for="new_name" id="new_name_label">New Video Name: </label>
+        <input type="text" name="new_name" id="new_name_input" />
+        <br />
+        <label for="new_thumbnail" id="new_thumbnail"
+          >New Video Thumbnail:
+        </label>
+        <input type="text" name="new_thumbnail" id="new_thumbnail_input" />
+        <br />
+        <input type="submit" class="submit_button" id="edit_submit_button" />
+      </form>
+
+      <div class="galleryButton">
+        <button id="backToGallery">Take me back to The Gallery!</button>
+      </div>
+      <script src="uploadVideo.js"></script>
+    </div>
+  </body>
+</html>

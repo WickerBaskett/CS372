@@ -7,4 +7,6 @@ const alert_status = urlParams.get("alert");
 
 if (alert_status == 1) {
   alert("Invalid Username or Password");
+} else if (alert_status == 2) {
+  alert("Invalid Session");
 }

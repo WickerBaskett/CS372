@@ -5,20 +5,7 @@
 const server_url = "http://localhost:4200"; // Endpoint to retrieve videos, should add a config option for this
 const table = document.getElementById("gal_table"); // Table element that videos will be added to
 const urlParams = new URLSearchParams(window.location.search); // A list of all query parameters
-const query = urlParams.get("q"); // The search query used to filter displayed videos
 const fav = urlParams.get("fav");
-let cookies = document.cookie
-  .split("&")
-  .map((item) => {
-    let args = item.split("=");
-    return args;
-  })
-  .reduce((acc, curr) => {
-    acc[curr[0]] = curr[1];
-    return acc;
-  }, []);
-
-console.log(cookies["user"]);
 
 /**
  * Creates a row in a table for a single video
@@ -32,20 +19,83 @@ function populateVideo(res) {
   const cellAnchor = document.createElement("a");
   cellAnchor.href = server_url + "/videoViewer?url=" + res.url; // <- We can pass stuff to the loaded page like this
   cellAnchor.textContent = res.name;
+
+  const thumbnailImg = document.createElement("img");
+  thumbnailImg.src = res.thumbnail;
+  thumbnailImg.alt = "Le video thumbnail";
+  thumbnailImg.style.width = "400px";
+  thumbnailImg.style.height = "auto";
+  thumbnailImg.style.display = "block";
+
+  cellAnchor.appendChild(thumbnailImg);
   cell.appendChild(cellAnchor);
 }
 
-// Fetch all videos from db and populate the gallery with them
-let req_url =
-  server_url +
-  "/videos?q=" +
-  query +
-  "&fav=" +
-  fav +
-  "&user=" +
-  cookies["user"];
-console.log(req_url);
-fetch(req_url)
+/**
+ * Updates the videos displayed based on query
+ * @param {String} query
+ */
+function updateDisplayedVideos(query) {
+  // Fill in first row of table with column names
+  let id_row = table.insertRow();
+  let name_cell = id_row.insertCell();
+  name_cell.innerHTML = "Name";
+
+  // Fetch all videos from db and populate the gallery with them
+  let req_url = server_url + "/api/videos?q=" + query + "&fav=" + fav;
+
+  console.log(req_url);
+
+  fetch(req_url)
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error("Failed to get list of videos");
+      }
+      return response.json();
+    })
+    .then((json) => {
+      Object.entries(json.videos)
+        .sort((a, b) => {
+          if (a[1].name < b[1].name) {
+            return -1;
+          }
+          if (a[1].name > b[1].name) {
+            return 1;
+          }
+          return 0;
+        })
+        .map((item) => {
+          populateVideo(item[1]);
+        });
+    })
+    .catch((error) => {
+      console.error("An error occurred with the fetch request: " + error);
+    });
+}
+
+/**
+ * Event handler for search button click
+ */
+function onSearchClick() {
+  table.innerHTML = "";
+  let query = document.getElementById("search_query");
+  updateDisplayedVideos(query.value);
+}
+
+/**
+ * Adds a button that links to the upload page for content editors
+ */
+function addUploadPageButton() {
+  const upload_page = document.createElement("button");
+  document.getElementById("upload_button_location").appendChild(upload_page);
+  upload_page.onclick = function () {
+    window.location.href = "/uploadVideo";
+  };
+  upload_page.innerHTML = "To Video Tools Suite";
+}
+
+// Determine wether to add any elements based on the users role
+fetch(server_url + "/api/whoami")
   .then((response) => {
     if (!response.ok) {
       throw new Error("Failed to get list of videos");
@@ -53,27 +103,10 @@ fetch(req_url)
     return response.json();
   })
   .then((json) => {
-    Object.entries(json.videos)
-      .sort((a, b) => {
-        if (a[1].name < b[1].name) {
-          return -1;
-        }
-        if (a[1].name > b[1].name) {
-          return 1;
-        }
-        return 0;
-      })
-      .map((item) => {
-        populateVideo(item[1]);
-      });
-  })
-  .catch((error) => {
-    console.error("An error occurred with the fetch request: " + error);
+    if (json.role == 1) {
+      addUploadPageButton();
+    }
   });
 
-/*
-const fav_button = document.getElementById("fav_button");
-
-fav_button.addEventListener("click", function () {
-  console.log("Button Clicked!");
-});*/
+document.getElementById("search_submit_button").onclick = onSearchClick;
+updateDisplayedVideos("");

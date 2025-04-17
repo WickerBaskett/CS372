@@ -51,3 +51,72 @@ export function checkPasswordFormat(pass) {
 
   return true;
 }
+
+/**
+ * Checks if url is a valid url
+ * @param {String} url
+ * @returns {Boolean}
+ * */
+export function checkURL(url) {
+  const url_reg =
+    /((([A-Za-z]{3,9}:(?:\/\/)?)(?:[-;:&=+$,\w]+@)?[A-Za-z0-9.-]+|(?:www.|[-;:&=+$,\w]+@)[A-Za-z0-9.-]+)((?:\/[+~%/.\w-_]*)?\??(?:[-+=&;%@.\w_]*)#?(?:[\w]*))?)/;
+
+  if (url_reg.test(url)) {
+    console.log("Valid url");
+    return true;
+  } else {
+    console.log("Invalid url");
+    return false;
+  }
+}
+
+/**
+ * Checks if thumbnail is a valid image link
+ * @param {String} thumbnail
+ * @returns {Boolean}
+ * */
+export function checkThumbnail(thumbnail) {
+  const thumbnail_reg =
+    /^https?:\/\/(.+\/)+.+(\.(gif|png|jpg|jpeg|webp|svg|psd|bmp|tif))$/i;
+
+  if (thumbnail_reg.test(thumbnail)) {
+    console.log("Valid thumnbail");
+    return true;
+  } else {
+    console.log("Invalid thumbnail");
+    return false;
+  }
+}
+
+/**
+ * Sanitize fields of videos
+ * @param {Number} role
+ * @param {Array} videos
+ * @returns
+ */
+export function sanitizeVideos(role, videos) {
+  let result = Object.entries(videos).map((video) => {
+    console.log("Video.name: ");
+    console.log(video[1]);
+    let sanitized = {
+      name: video[1].name,
+      url: video[1].url,
+      thumbnail: video[1].thumbnail,
+    };
+
+    if (role == 2) {
+      // Marketing Manager
+      sanitized.likes = video[1].likes;
+      sanitized.dislikes = video[1].dislikes;
+    } else if (role == 1) {
+      // Content Editor
+      sanitized.comment = video[1].comment;
+    }
+    console.log("Sanitized: ");
+    console.log(sanitized);
+    return sanitized;
+  });
+
+  console.log(result);
+  return result;
+}
