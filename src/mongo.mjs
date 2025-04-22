@@ -3,9 +3,13 @@
 // into the mongodb database associated with
 // the service
 
+import { configDotenv } from "dotenv";
 import { MongoClient } from "mongodb";
 
-const uri = "mongodb://localhost:27017";
+// Load config from .env
+configDotenv();
+const db_name = process.env.DB_NAME;
+const db_uri = process.env.DB_URI;
 
 /**
  * Retrieve the first document with a name field that matches
@@ -14,10 +18,10 @@ const uri = "mongodb://localhost:27017";
  * @returns {WithId<Document>}
  * */
 export async function retrieveUser(username) {
-  let client = new MongoClient(uri);
+  let client = new MongoClient(db_uri);
   try {
     // define a database and collection on which to run the method
-    const database = client.db("importantDatabase");
+    const database = client.db(db_name);
     const coll = database.collection("users");
 
     const distinctValues = await coll.findOne({ username: username });
@@ -36,10 +40,10 @@ export async function retrieveUser(username) {
  * @param {String} username
  */
 export async function createUser(username, pass) {
-  let client = new MongoClient(uri);
+  let client = new MongoClient(db_uri);
   try {
     // define a database and collection on which to run the method
-    const database = client.db("importantDatabase");
+    const database = client.db(db_name);
     const coll = database.collection("users");
 
     await coll.insertOne({
@@ -65,10 +69,10 @@ export async function createUser(username, pass) {
  * @param {String} thumbURL
  */
 export async function createVideo(videoName, videoURL, thumbURL) {
-  let client = new MongoClient(uri);
+  let client = new MongoClient(db_uri);
   try {
     // define a database and collection on which to run the method
-    const database = client.db("importantDatabase");
+    const database = client.db(db_name);
     const coll = database.collection("videos");
 
     await coll.insertOne({
@@ -90,10 +94,10 @@ export async function createVideo(videoName, videoURL, thumbURL) {
  * @param {String} removeVideoName
  */
 export async function deleteVideo(removeVideoName) {
-  let client = new MongoClient(uri);
+  let client = new MongoClient(db_uri);
   try {
     // define a database and collection on which to run the method
-    const database = client.db("importantDatabase");
+    const database = client.db(db_name);
     const coll = database.collection("videos");
 
     await coll.deleteOne({
@@ -111,10 +115,10 @@ export async function deleteVideo(removeVideoName) {
  * @param {JSON} query
  */
 export async function editVideo(filter, query) {
-  let client = new MongoClient(uri);
+  let client = new MongoClient(db_uri);
   try {
     // define a database and collection on which to run the method
-    const database = client.db("importantDatabase");
+    const database = client.db(db_name);
     const coll = database.collection("videos");
 
     await coll.updateOne(filter, query);
@@ -132,9 +136,9 @@ export async function editVideo(filter, query) {
  * @returns {Promise<void>}
  * */
 export async function updateLoginTally(username, count) {
-  let client = new MongoClient(uri);
+  let client = new MongoClient(db_uri);
   try {
-    const database = client.db("importantDatabase");
+    const database = client.db(db_name);
     const coll = database.collection("users");
 
     if (count == 2) {
@@ -159,10 +163,10 @@ export async function updateLoginTally(username, count) {
  * @returns {void}
  * */
 export async function retrieveVideos(field, query) {
-  let client = new MongoClient(uri);
+  let client = new MongoClient(db_uri);
   try {
     // define a database and collection on which to run the method
-    const database = client.db("importantDatabase");
+    const database = client.db(db_name);
     const coll = database.collection("videos");
 
     const distinctValues = await coll
@@ -183,10 +187,10 @@ export async function retrieveVideos(field, query) {
  * @returns {void}
  */
 export async function updateUserOpinion(vid, inc_query) {
-  let client = new MongoClient(uri);
+  let client = new MongoClient(db_uri);
   try {
     // define a database and collection on which to run the method
-    const database = client.db("importantDatabase");
+    const database = client.db(db_name);
     const coll = database.collection("videos");
 
     const filter = { url: vid };
@@ -206,9 +210,9 @@ export async function updateUserOpinion(vid, inc_query) {
  * @return {void}
  */
 export async function updateFavorites(vid, user, adding) {
-  let client = new MongoClient(uri);
+  let client = new MongoClient(db_uri);
   try {
-    const database = client.db("importantDatabase");
+    const database = client.db(db_name);
     const coll = database.collection("users");
 
     const filter = { username: user };
@@ -233,9 +237,9 @@ export async function updateFavorites(vid, user, adding) {
  * @return {void}
  */
 export async function updateDisfavorites(vid, user, adding) {
-  let client = new MongoClient(uri);
+  let client = new MongoClient(db_uri);
   try {
-    const database = client.db("importantDatabase");
+    const database = client.db(db_name);
     const coll = database.collection("users");
 
     const filter = { username: user };
@@ -253,9 +257,9 @@ export async function updateDisfavorites(vid, user, adding) {
 }
 
 export async function uploadComment(vid, comment) {
-  let client = new MongoClient(uri);
+  let client = new MongoClient(db_uri);
   try {
-    const database = client.db("importantDatabase");
+    const database = client.db(db_name);
     const coll = database.collection("videos");
 
     const filter = { url: vid };
