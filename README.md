@@ -74,6 +74,7 @@ db.videos.insertOne({
     url: "https://www.youtube.com/embed/M5FGuBatbTg?si=W25JyYlJveMuvbi3", likes: 0, 
     dislikes: 0, 
     comment: "This is a comment"
+    thumbnail: "https://cdn.pixabay.com/photo/2024/12/24/10/04/kitchen-9288111_960_720.jpg"
     }
 )
 ```
