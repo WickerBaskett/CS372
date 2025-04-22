@@ -14,7 +14,7 @@ You will need to create a file named `.env` in the root directory of this projec
 
 ```
 SESSION_KEY="your_key_here"
-DB_NAME="importantDatabase"
+DB_NAME="your_db_name"
 DB_URI="mongodb://localhost:27017"
 ```
 
