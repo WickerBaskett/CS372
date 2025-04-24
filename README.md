@@ -33,7 +33,8 @@ db.users.insertOne({
     password: "54de7f606f2523cba8efac173fab42fb7f59d56ceff974c8fdb7342cf2cfe345", 
     login_tally: 0, 
     role: 0, 
-    favorites: []
+    favorites: [],
+    disfavorite: [],
     }
 )
 ```
@@ -47,7 +48,8 @@ db.users.insertOne({
     username: "editor@gmail.test", 
     password: "54de7f606f2523cba8efac173fab42fb7f59d56ceff974c8fdb7342cf2cfe345", login_tally: 0, 
     role: 1, 
-    favorites: []
+    favorites: [],
+    disfavorite: [],
     }
 )
 ```
@@ -62,7 +64,8 @@ db.users.insertOne({
     password: "54de7f606f2523cba8efac173fab42fb7f59d56ceff974c8fdb7342cf2cfe345", 
     login_tally: 0,
     role: 2,
-     favorites: []
+     favorites: [],
+     disfavorite: [],
      }
 )
 ```
