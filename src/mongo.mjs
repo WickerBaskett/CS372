@@ -17,7 +17,7 @@ const db_uri = process.env.DB_URI;
  * @param {String} username
  * @returns {WithId<Document>}
  * */
-export async function retrieveUser(username) {
+async function retrieveUser(username) {
   let client = new MongoClient(db_uri);
   try {
     // define a database and collection on which to run the method
@@ -39,7 +39,7 @@ export async function retrieveUser(username) {
  * @param {String} pass
  * @param {String} username
  */
-export async function createUser(username, pass) {
+async function createUser(username, pass) {
   let client = new MongoClient(db_uri);
   try {
     // define a database and collection on which to run the method
@@ -68,7 +68,7 @@ export async function createUser(username, pass) {
  * @param {String} videoURL
  * @param {String} thumbURL
  */
-export async function createVideo(videoName, videoURL, thumbURL) {
+async function createVideo(videoName, videoURL, thumbURL) {
   let client = new MongoClient(db_uri);
   try {
     // define a database and collection on which to run the method
@@ -93,7 +93,7 @@ export async function createVideo(videoName, videoURL, thumbURL) {
  * Video is removed based on the name passed
  * @param {String} removeVideoName
  */
-export async function deleteVideo(removeVideoName) {
+async function deleteVideo(removeVideoName) {
   let client = new MongoClient(db_uri);
   try {
     // define a database and collection on which to run the method
@@ -114,7 +114,7 @@ export async function deleteVideo(removeVideoName) {
  * @param {String} name
  * @param {JSON} query
  */
-export async function editVideo(filter, query) {
+async function editVideo(filter, query) {
   let client = new MongoClient(db_uri);
   try {
     // define a database and collection on which to run the method
@@ -135,7 +135,7 @@ export async function editVideo(filter, query) {
  * @param {Number} count
  * @returns {Promise<void>}
  * */
-export async function updateLoginTally(username, count) {
+async function updateLoginTally(username, count) {
   let client = new MongoClient(db_uri);
   try {
     const database = client.db(db_name);
@@ -162,7 +162,7 @@ export async function updateLoginTally(username, count) {
  * @param {String} query
  * @returns {void}
  * */
-export async function retrieveVideos(field, query) {
+async function retrieveVideos(field, query) {
   let client = new MongoClient(db_uri);
   try {
     // define a database and collection on which to run the method
@@ -180,13 +180,12 @@ export async function retrieveVideos(field, query) {
 
 /**
  * Retrieve likes/dislikes
- * Increment/decrement likes based on user input, if dir is
- * true increment likes, if dir is false decrement likes
- * @param {String} vid
- * @param {{key: value}} inc_query
+ * Increment/decrement likes based on inc_query
+ * @param {String} vid - Url of video
+ * @param {{key: value}} inc_query - {(likes|dislikes): amount to increment}
  * @returns {void}
  */
-export async function updateUserOpinion(vid, inc_query) {
+async function updateUserOpinion(vid, inc_query) {
   let client = new MongoClient(db_uri);
   try {
     // define a database and collection on which to run the method
@@ -204,12 +203,12 @@ export async function updateUserOpinion(vid, inc_query) {
 
 /**
  * Add liked videos to user's favorites list
- * @param {String} user
- * @param {String} vid
- * @param {Boolean} adding
+ * @param {String} user - Username to update
+ * @param {String} vid - Url of video
+ * @param {Boolean} adding - True = Add, False = Remove
  * @return {void}
  */
-export async function updateFavorites(vid, user, adding) {
+async function updateFavorites(vid, user, adding) {
   let client = new MongoClient(db_uri);
   try {
     const database = client.db(db_name);
@@ -231,12 +230,12 @@ export async function updateFavorites(vid, user, adding) {
 
 /**
  * Add liked videos to user's favorites list
- * @param {String} user
- * @param {String} vid
- * @param {Boolean} adding
+ * @param {String} user - Username to update
+ * @param {String} vid - Url of video
+ * @param {Boolean} adding - True = Add, False = Remove
  * @return {void}
  */
-export async function updateDisfavorites(vid, user, adding) {
+async function updateDisfavorites(vid, user, adding) {
   let client = new MongoClient(db_uri);
   try {
     const database = client.db(db_name);
@@ -256,7 +255,12 @@ export async function updateDisfavorites(vid, user, adding) {
   }
 }
 
-export async function uploadComment(vid, comment) {
+/**
+ * 
+ * @param {String} vid - The Url of the video to add the comment to
+ * @param {String} comment - The comment to be uploaded 
+ */
+async function uploadComment(vid, comment) {
   let client = new MongoClient(db_uri);
   try {
     const database = client.db(db_name);
@@ -270,3 +274,5 @@ export async function uploadComment(vid, comment) {
     await client.close();
   }
 }
+
+export {retrieveUser, createUser, createVideo, deleteVideo, editVideo, updateLoginTally, retrieveVideos, updateUserOpinion, updateFavorites, updateDisfavorites, uploadComment};

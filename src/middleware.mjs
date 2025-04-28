@@ -7,7 +7,7 @@
  * @param {object} res
  * @param {function} next
  */
-export function authUser(req, res, next) {
+function authUser(req, res, next) {
   if (req.session.isLoggedIn == true) {
     next();
   } else {
@@ -21,7 +21,7 @@ export function authUser(req, res, next) {
  * @param {object} res
  * @param {function} next
  */
-export function authContentEditor(req, res, next) {
+function authContentEditor(req, res, next) {
   if (req.session.role == 1) {
     next();
   } else {
@@ -35,10 +35,12 @@ export function authContentEditor(req, res, next) {
  * @param {object} res
  * @param {function} next
  */
-export function authMarketingManager(req, res, next) {
+function authMarketingManager(req, res, next) {
   if (req.session.role == 2) {
     next();
   } else {
     res.redirect("/login.html?alert=2");
   }
 }
+
+export {authUser, authContentEditor, authMarketingManager};

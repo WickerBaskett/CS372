@@ -1,6 +1,7 @@
-// api.mjs
-// Contains code for all api endpoints
-
+/**
+    Contains code for all api endpoints
+    @module api
+*/
 import { sha256 } from "js-sha256";
 
 import {
@@ -15,13 +16,13 @@ import {
   updateFavorites,
   uploadComment,
   editVideo,
-} from "./mongo.js";
+} from "./mongo.mjs";
 import {
   checkPasswordFormat,
   checkUsername,
   checkURL,
   sanitizeVideos,
-} from "./validity.js";
+} from "./validity.mjs";
 
 //////////////////////////////
 //    All User Endpoints    //
@@ -30,11 +31,12 @@ import {
 /**
  * Handles authentication of username password combos
  * and creates user sessions
+ * @function loginUser
  * @param {object} req
  * @param {object} res
  * @returns
  */
-export function loginUser(req, res) {
+function loginUser(req, res) {
   const alert_url = "/login.html?alert=1";
   res.setHeader("Content-Type", "application/json");
 
@@ -78,11 +80,12 @@ export function loginUser(req, res) {
 
 /**
  * Register a new user
+ * @function registerUser
  * @param {object} req
  * @param {object} res
  * @returns
  */
-export function registerUser(req, res) {
+function registerUser(req, res) {
   res.setHeader("Content-Type", "application/json");
   const alert_url = "/login.html?alert=1";
 
@@ -112,11 +115,12 @@ export function registerUser(req, res) {
  * Sends a list of videos back to the requester.
  * Fields associated with each video are sanitized
  * based on requester role
+ * @function getVideos
  * @param {object} req
  * @param {object} res
  * @returns
  */
-export function getVideos(req, res) {
+function getVideos(req, res) {
   if (req.query.fav == "true") {
     // Send the gallery a list of the users favorite movies
     retrieveUser(req.session.username).then((result) => {
@@ -173,10 +177,11 @@ export function getVideos(req, res) {
 
 /**
  * Sets user opinion on a video
+ * @function setOpinion
  * @param {object} req
  * @param {object} res
  */
-export function setOpinion(req, res) {
+function setOpinion(req, res) {
   const opinion = req.query.opinion;
   const vid = req.query.vid;
   const user = req.session.username;
@@ -213,10 +218,11 @@ export function setOpinion(req, res) {
 
 /**
  * Tells the requester their username and role
+ * @function whoami
  * @param {object} req
  * @param {object} res
  */
-export function whoami(req, res) {
+function whoami(req, res) {
   res.setHeader("Content-Type", "application/json");
   res.end(
     JSON.stringify({
@@ -232,11 +238,12 @@ export function whoami(req, res) {
 
 /**
  * Upload a new video to the database
+ * @function uploadVideo
  * @param {object} req
  * @param {object} res
  * @returns
  */
-export function uploadVideo(req, res) {
+function uploadVideo(req, res) {
   console.log(req.body);
   res.setHeader("Content-Type", "application/json");
   const video_alert_url = "/uploadVideo";
@@ -266,11 +273,12 @@ export function uploadVideo(req, res) {
 
 /**
  * Remove a video from the database
+ * @function removeVideo
  * @param {object} req
  * @param {object} res
  * @returns
  */
-export function removeVideo(req, res) {
+function removeVideo(req, res) {
   res.setHeader("Content-Type", "application/json");
 
   deleteVideo(req.body.video_name_input);
@@ -279,11 +287,12 @@ export function removeVideo(req, res) {
 
 /**
  * Edit fields of an existing video in the database
+ * @function modifyVideo
  * @param {object} req
  * @param {object} res
  * @returns
  */
-export function modifyVideo(req, res) {
+function modifyVideo(req, res) {
   if (req.body.curr_name == "") {
     res.statusMessage = "Current Name field was empty";
     res.redirect("/uploadVideo");
@@ -311,12 +320,16 @@ export function modifyVideo(req, res) {
 
 /**
  * Modifys the comment field of a video in the database
+ * @function modifyComment
  * @param {object} req
  * @param {object} res
  */
-export function modifyComment(req, res) {
+function modifyComment(req, res) {
   let comment = req.body.comment;
   let url = req.body.url;
   uploadComment(url, comment);
   res.redirect("/videoViewer?url=" + url);
 }
+
+
+export {loginUser, registerUser, getVideos, setOpinion, whoami, uploadVideo, removeVideo, modifyVideo, modifyComment};
