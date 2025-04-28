@@ -17,7 +17,7 @@ import {
   authUser,
   authContentEditor,
   authMarketingManager,
-} from "./middleware.mjs";
+} from "./middleware.js";
 import {
   getVideos,
   loginUser,
@@ -28,7 +28,7 @@ import {
   setOpinion,
   uploadVideo,
   whoami,
-} from "./api.mjs";
+} from "./api.js";
 
 ///////////////////
 //     Setup     //

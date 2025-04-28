@@ -15,13 +15,13 @@ import {
   updateFavorites,
   uploadComment,
   editVideo,
-} from "./mongo.mjs";
+} from "./mongo.js";
 import {
   checkPasswordFormat,
   checkUsername,
   checkURL,
   sanitizeVideos,
-} from "./validity.mjs";
+} from "./validity.js";
 
 //////////////////////////////
 //    All User Endpoints    //
