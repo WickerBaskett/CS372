@@ -1,13 +1,15 @@
-// middleware.mjs
-// Contains all custom middleware
-
+/**
+ * Contains all custom middleware
+ * @module middleware
+ */
 /**
  * Custom middleware to validate that user is logged in
- * @param {object} req
- * @param {object} res
- * @param {function} next
+ * @function authUser
+ * @param {object} req - Request
+ * @param {object} res - Response
+ * @param {function} next - Next middleware
  */
-export function authUser(req, res, next) {
+function authUser(req, res, next) {
   if (req.session.isLoggedIn == true) {
     next();
   } else {
@@ -17,11 +19,12 @@ export function authUser(req, res, next) {
 
 /**
  * Custom middleware to validate that user is a Content Editor
- * @param {object} req
- * @param {object} res
- * @param {function} next
+ * @function authContentEditor
+ * @param {object} req - Request
+ * @param {object} res - Response
+ * @param {function} next - Next middleware
  */
-export function authContentEditor(req, res, next) {
+function authContentEditor(req, res, next) {
   if (req.session.role == 1) {
     next();
   } else {
@@ -31,14 +34,17 @@ export function authContentEditor(req, res, next) {
 
 /**
  * Custom middleware to validate that user is a Content Editor
- * @param {object} req
- * @param {object} res
- * @param {function} next
+ * @function authMarketingManager
+ * @param {object} req - Request
+ * @param {object} res - Response
+ * @param {function} next - Next middleware
  */
-export function authMarketingManager(req, res, next) {
+function authMarketingManager(req, res, next) {
   if (req.session.role == 2) {
     next();
   } else {
     res.redirect("/login.html?alert=2");
   }
 }
+
+export { authUser, authContentEditor, authMarketingManager };
