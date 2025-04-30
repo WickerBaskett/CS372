@@ -1,12 +1,15 @@
-// validity.mjs
-// Contains logic to check username and password validity
+/**
+ * Contains logic to check username and password validity
+ * @module validity
+*/
 
 /**
  * Checks if username meets username validity requirements
- * @param {String} username
+ * @function checkUsername
+ * @param {String} username - Username to validate
  * @returns {Boolean}
  * */
-export function checkUsername(username) {
+function checkUsername(username) {
   const email_reg = /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
   if (email_reg.test(username)) {
@@ -20,10 +23,11 @@ export function checkUsername(username) {
 
 /**
  * Checks if pass meets password complexity requirnments
- * @param {String} pass
+ * @function checkPasswordFormat
+ * @param {String} pass - Password to validate
  * @returns {Boolean}
  * */
-export function checkPasswordFormat(pass) {
+function checkPasswordFormat(pass) {
   const cap_reg = /[A-Z]/;
   const low_reg = /[a-z]/;
   const num_reg = /[0-9]/;
@@ -54,10 +58,11 @@ export function checkPasswordFormat(pass) {
 
 /**
  * Checks if url is a valid url
- * @param {String} url
+ * @function checkURL
+ * @param {String} url - Url to validate
  * @returns {Boolean}
  * */
-export function checkURL(url) {
+function checkURL(url) {
   const url_reg =
     /((([A-Za-z]{3,9}:(?:\/\/)?)(?:[-;:&=+$,\w]+@)?[A-Za-z0-9.-]+|(?:www.|[-;:&=+$,\w]+@)[A-Za-z0-9.-]+)((?:\/[+~%/.\w-_]*)?\??(?:[-+=&;%@.\w_]*)#?(?:[\w]*))?)/;
 
@@ -72,10 +77,11 @@ export function checkURL(url) {
 
 /**
  * Checks if thumbnail is a valid image link
- * @param {String} thumbnail
+ * @function checkThumbnail
+ * @param {String} thumbnail - Thumbnail Url to validate
  * @returns {Boolean}
  * */
-export function checkThumbnail(thumbnail) {
+function checkThumbnail(thumbnail) {
   const thumbnail_reg =
     /^https?:\/\/(.+\/)+.+(\.(gif|png|jpg|jpeg|webp|svg|psd|bmp|tif))$/i;
 
@@ -89,12 +95,13 @@ export function checkThumbnail(thumbnail) {
 }
 
 /**
- * Sanitize fields of videos
- * @param {Number} role
- * @param {Array} videos
- * @returns
+ * Sanitize fields of videos based on the role of the client
+ * @function sanitizeVideos
+ * @param {Number} role - Role of user
+ * @param {Array} videos - Unsanitized list of videos
+ * @returns {Array} - Sanitized list of videos
  */
-export function sanitizeVideos(role, videos) {
+function sanitizeVideos(role, videos) {
   let result = Object.entries(videos).map((video) => {
     console.log("Video.name: ");
     console.log(video[1]);
@@ -120,3 +127,5 @@ export function sanitizeVideos(role, videos) {
   console.log(result);
   return result;
 }
+
+export {checkUsername, checkPasswordFormat, checkURL, checkThumbnail, sanitizeVideos}

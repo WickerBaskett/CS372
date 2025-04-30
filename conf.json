@@ -1,5 +1,5 @@
 {
-    "plugins": [],
+    "plugins": ["node_modules/jsdoc-strip-async-await"],
     "recurseDepth": 10,
     "source": {
         "includePattern": ".+\\.(js(doc|x)?|mjs)$",

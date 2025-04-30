@@ -1,6 +1,6 @@
 /**
-    Contains code for all api endpoints
-    @module api
+ * Contains code for all api endpoints
+ * @module api
 */
 import { sha256 } from "js-sha256";
 
@@ -32,9 +32,8 @@ import {
  * Handles authentication of username password combos
  * and creates user sessions
  * @function loginUser
- * @param {object} req
- * @param {object} res
- * @returns
+ * @param {object} req - Request
+ * @param {object} res - Response
  */
 function loginUser(req, res) {
   const alert_url = "/login.html?alert=1";
@@ -81,9 +80,8 @@ function loginUser(req, res) {
 /**
  * Register a new user
  * @function registerUser
- * @param {object} req
- * @param {object} res
- * @returns
+ * @param {object} req - Request
+ * @param {object} res - Response
  */
 function registerUser(req, res) {
   res.setHeader("Content-Type", "application/json");
@@ -116,9 +114,8 @@ function registerUser(req, res) {
  * Fields associated with each video are sanitized
  * based on requester role
  * @function getVideos
- * @param {object} req
- * @param {object} res
- * @returns
+ * @param {object} req - Request
+ * @param {object} res - Response
  */
 function getVideos(req, res) {
   if (req.query.fav == "true") {
@@ -178,8 +175,8 @@ function getVideos(req, res) {
 /**
  * Sets user opinion on a video
  * @function setOpinion
- * @param {object} req
- * @param {object} res
+ * @param {object} req - Request
+ * @param {object} res - Response
  */
 function setOpinion(req, res) {
   const opinion = req.query.opinion;
@@ -219,8 +216,8 @@ function setOpinion(req, res) {
 /**
  * Tells the requester their username and role
  * @function whoami
- * @param {object} req
- * @param {object} res
+ * @param {object} req - Request
+ * @param {object} res - Response
  */
 function whoami(req, res) {
   res.setHeader("Content-Type", "application/json");
@@ -239,9 +236,8 @@ function whoami(req, res) {
 /**
  * Upload a new video to the database
  * @function uploadVideo
- * @param {object} req
- * @param {object} res
- * @returns
+ * @param {object} req - Request
+ * @param {object} res - Response
  */
 function uploadVideo(req, res) {
   console.log(req.body);
@@ -274,9 +270,8 @@ function uploadVideo(req, res) {
 /**
  * Remove a video from the database
  * @function removeVideo
- * @param {object} req
- * @param {object} res
- * @returns
+ * @param {object} req - Request
+ * @param {object} res - Response
  */
 function removeVideo(req, res) {
   res.setHeader("Content-Type", "application/json");
@@ -288,9 +283,8 @@ function removeVideo(req, res) {
 /**
  * Edit fields of an existing video in the database
  * @function modifyVideo
- * @param {object} req
- * @param {object} res
- * @returns
+ * @param {object} req - Request
+ * @param {object} res - Response
  */
 function modifyVideo(req, res) {
   if (req.body.curr_name == "") {
@@ -321,8 +315,8 @@ function modifyVideo(req, res) {
 /**
  * Modifys the comment field of a video in the database
  * @function modifyComment
- * @param {object} req
- * @param {object} res
+ * @param {object} req - Request
+ * @param {object} res - Response
  */
 function modifyComment(req, res) {
   let comment = req.body.comment;

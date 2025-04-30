@@ -1,7 +1,9 @@
-// mongo.mjs
-// Handles retrieval and insertion of data
-// into the mongodb database associated with
-// the service
+/**
+ * Handles retrieval and insertion of data
+ * into the mongodb database associated with
+ * the service
+ * @module mongo
+*/
 
 import { configDotenv } from "dotenv";
 import { MongoClient } from "mongodb";
@@ -14,7 +16,9 @@ const db_uri = process.env.DB_URI;
 /**
  * Retrieve the first document with a name field that matches
  * username and returns it
- * @param {String} username
+ * @async
+ * @function retrieveUser
+ * @param {String} username - Username to search the database for
  * @returns {WithId<Document>}
  * */
 async function retrieveUser(username) {
@@ -36,8 +40,10 @@ async function retrieveUser(username) {
  * Add a new user to the users collection
  * User name and password are set according to parameters
  * All other user values are 0 by default
- * @param {String} pass
- * @param {String} username
+ * @async
+ * @function createUser
+ * @param {String} pass - New password for user, should already be hashed
+ * @param {String} username - New username for user
  */
 async function createUser(username, pass) {
   let client = new MongoClient(db_uri);
@@ -61,12 +67,13 @@ async function createUser(username, pass) {
 
 /**
  * Add a new video to the videos collection
- * Video name, url, and thumbnail are set according to parameters
- * Likes/dislikes are 0 by default
- * Comment is empty by default
- * @param {String} videoName
- * @param {String} videoURL
- * @param {String} thumbURL
+ * Likes/dislikes are set to 0
+ * Comment is left empty
+ * @async
+ * @function createVideo
+ * @param {String} videoName - Name of video
+ * @param {String} videoURL - Url of video
+ * @param {String} thumbURL - Url of thumbnail
  */
 async function createVideo(videoName, videoURL, thumbURL) {
   let client = new MongoClient(db_uri);
@@ -90,8 +97,9 @@ async function createVideo(videoName, videoURL, thumbURL) {
 
 /**
  * Remove a video from the videos collection
- * Video is removed based on the name passed
- * @param {String} removeVideoName
+ * @async
+ * @function deleteVideo
+ * @param {String} removeVideoName - Name of video to be removed
  */
 async function deleteVideo(removeVideoName) {
   let client = new MongoClient(db_uri);
@@ -111,8 +119,10 @@ async function deleteVideo(removeVideoName) {
 /**
  * Updates fields specified in query for video specified by name
  * in the videos collection
- * @param {String} name
- * @param {JSON} query
+ * @async
+ * @function editVideo
+ * @param {JSON} filter - The filter used in the mongodb updateOne call
+ * @param {JSON} query  - The query used in the mongodb updateOne call
  */
 async function editVideo(filter, query) {
   let client = new MongoClient(db_uri);
@@ -131,8 +141,10 @@ async function editVideo(filter, query) {
  * Sets the login_tally field of the document with name matching
  * username to count + 1. If count is 2 then it will delete the
  * associated account
- * @param {String} username
- * @param {Number} count
+ * @async
+ * @function updateLoginTally
+ * @param {String} username - Username of account
+ * @param {Number} count - Current login tally count
  * @returns {Promise<void>}
  * */
 async function updateLoginTally(username, count) {
@@ -159,7 +171,10 @@ async function updateLoginTally(username, count) {
 
 /**
  * Retrieve the all videos stored in the database
- * @param {String} query
+ * @async
+ * @function retrieveVideos
+ * @param {String} field - Field in database to search
+ * @param {String} query - Regex matched with case insensitivity against contents of ${field} in videos
  * @returns {void}
  * */
 async function retrieveVideos(field, query) {
@@ -181,6 +196,8 @@ async function retrieveVideos(field, query) {
 /**
  * Retrieve likes/dislikes
  * Increment/decrement likes based on inc_query
+ * @async
+ * @function updateUserOpinion
  * @param {String} vid - Url of video
  * @param {{key: value}} inc_query - {(likes|dislikes): amount to increment}
  * @returns {void}
@@ -203,6 +220,8 @@ async function updateUserOpinion(vid, inc_query) {
 
 /**
  * Add liked videos to user's favorites list
+ * @async
+ * @function updateFavorites
  * @param {String} user - Username to update
  * @param {String} vid - Url of video
  * @param {Boolean} adding - True = Add, False = Remove
@@ -230,6 +249,8 @@ async function updateFavorites(vid, user, adding) {
 
 /**
  * Add liked videos to user's favorites list
+ * @async
+ * @function updateDisfavorites
  * @param {String} user - Username to update
  * @param {String} vid - Url of video
  * @param {Boolean} adding - True = Add, False = Remove
@@ -256,7 +277,9 @@ async function updateDisfavorites(vid, user, adding) {
 }
 
 /**
- * 
+ * Overwrite the comment on a video with a new comment
+ * @async
+ * @function uploadComment
  * @param {String} vid - The Url of the video to add the comment to
  * @param {String} comment - The comment to be uploaded 
  */

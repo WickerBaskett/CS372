@@ -1,11 +1,13 @@
-// middleware.mjs
-// Contains all custom middleware
-
+/** 
+ * Contains all custom middleware
+ * @module middleware
+*/
 /**
  * Custom middleware to validate that user is logged in
- * @param {object} req
- * @param {object} res
- * @param {function} next
+ * @function authUser
+ * @param {object} req - Request
+ * @param {object} res - Response
+ * @param {function} next - Next middleware
  */
 function authUser(req, res, next) {
   if (req.session.isLoggedIn == true) {
@@ -17,9 +19,10 @@ function authUser(req, res, next) {
 
 /**
  * Custom middleware to validate that user is a Content Editor
- * @param {object} req
- * @param {object} res
- * @param {function} next
+ * @function authContentEditor
+ * @param {object} req - Request
+ * @param {object} res - Response
+ * @param {function} next - Next middleware
  */
 function authContentEditor(req, res, next) {
   if (req.session.role == 1) {
@@ -31,9 +34,10 @@ function authContentEditor(req, res, next) {
 
 /**
  * Custom middleware to validate that user is a Content Editor
- * @param {object} req
- * @param {object} res
- * @param {function} next
+ * @function authMarketingManager
+ * @param {object} req - Request
+ * @param {object} res - Response
+ * @param {function} next - Next middleware
  */
 function authMarketingManager(req, res, next) {
   if (req.session.role == 2) {
