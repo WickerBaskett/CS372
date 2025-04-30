@@ -1,7 +1,7 @@
-/** 
+/**
  * Contains all custom middleware
  * @module middleware
-*/
+ */
 /**
  * Custom middleware to validate that user is logged in
  * @function authUser
@@ -47,4 +47,4 @@ function authMarketingManager(req, res, next) {
   }
 }
 
-export {authUser, authContentEditor, authMarketingManager};
+export { authUser, authContentEditor, authMarketingManager };

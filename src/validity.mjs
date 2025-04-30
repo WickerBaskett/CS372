@@ -1,7 +1,7 @@
 /**
  * Contains logic to check username and password validity
  * @module validity
-*/
+ */
 
 /**
  * Checks if username meets username validity requirements
@@ -128,4 +128,10 @@ function sanitizeVideos(role, videos) {
   return result;
 }
 
-export {checkUsername, checkPasswordFormat, checkURL, checkThumbnail, sanitizeVideos}
+export {
+  checkUsername,
+  checkPasswordFormat,
+  checkURL,
+  checkThumbnail,
+  sanitizeVideos,
+};

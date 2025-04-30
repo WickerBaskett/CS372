@@ -1,7 +1,7 @@
 /**
  * Contains code for all api endpoints
  * @module api
-*/
+ */
 import { sha256 } from "js-sha256";
 
 import {
@@ -325,5 +325,14 @@ function modifyComment(req, res) {
   res.redirect("/videoViewer?url=" + url);
 }
 
-
-export {loginUser, registerUser, getVideos, setOpinion, whoami, uploadVideo, removeVideo, modifyVideo, modifyComment};
+export {
+  loginUser,
+  registerUser,
+  getVideos,
+  setOpinion,
+  whoami,
+  uploadVideo,
+  removeVideo,
+  modifyVideo,
+  modifyComment,
+};

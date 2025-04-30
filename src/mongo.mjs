@@ -3,7 +3,7 @@
  * into the mongodb database associated with
  * the service
  * @module mongo
-*/
+ */
 
 import { configDotenv } from "dotenv";
 import { MongoClient } from "mongodb";
@@ -281,7 +281,7 @@ async function updateDisfavorites(vid, user, adding) {
  * @async
  * @function uploadComment
  * @param {String} vid - The Url of the video to add the comment to
- * @param {String} comment - The comment to be uploaded 
+ * @param {String} comment - The comment to be uploaded
  */
 async function uploadComment(vid, comment) {
   let client = new MongoClient(db_uri);
@@ -298,4 +298,16 @@ async function uploadComment(vid, comment) {
   }
 }
 
-export {retrieveUser, createUser, createVideo, deleteVideo, editVideo, updateLoginTally, retrieveVideos, updateUserOpinion, updateFavorites, updateDisfavorites, uploadComment};
+export {
+  retrieveUser,
+  createUser,
+  createVideo,
+  deleteVideo,
+  editVideo,
+  updateLoginTally,
+  retrieveVideos,
+  updateUserOpinion,
+  updateFavorites,
+  updateDisfavorites,
+  uploadComment,
+};
